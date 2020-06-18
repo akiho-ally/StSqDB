@@ -2,18 +2,19 @@ from model import EventDetector
 import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
-from dataloader import GolfDB, ToTensor, Normalize
+from dataloader import StsqDB, ToTensor, Normalize
 import torch.nn.functional as F
 import numpy as np
 from util import correct_preds
+
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def eval(model, split, seq_length, n_cpu, disp):
     
 
-    dataset = GolfDB(data_file='data/val_split_{}.pkl'.format(split),
-                     vid_dir='data/videos_160/',
+    dataset = StsqDB(data_file='val_split_{}.pkl'.format(split),
+                     vid_dir='data/videos_40/',
                      seq_length=seq_length,
                      transform=transforms.Compose([ToTensor(),
                                                    Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
@@ -29,6 +30,7 @@ def eval(model, split, seq_length, n_cpu, disp):
 
     for i, sample in enumerate(data_loader):
         images, labels = sample['images'], sample['labels']
+
         # full samples do not fit into GPU memory so evaluate sample in 'seq_length' batches
         batch = 0
         while batch * seq_length < images.shape[1]:
@@ -37,6 +39,7 @@ def eval(model, split, seq_length, n_cpu, disp):
             else:
                 image_batch = images[:, batch * seq_length:(batch + 1) * seq_length, :, :, :]
             logits = model(image_batch.to(device))
+
             if batch == 0:
                 probs = F.softmax(logits.data, dim=1).to(device).numpy()
             else:
@@ -45,7 +48,10 @@ def eval(model, split, seq_length, n_cpu, disp):
         _, _, _, _, c = correct_preds(probs, labels.squeeze())
         if disp:
             print(i, c)
+            print(np.mean(c))
         correct.append(c)
+        print(correct)
+
     PCE = np.mean(correct)
     return PCE
 
@@ -53,7 +59,7 @@ def eval(model, split, seq_length, n_cpu, disp):
 if __name__ == '__main__':
 
     split = 1
-    seq_length = 64
+    seq_length = 300
     n_cpu = 6
 
     model = EventDetector(pretrain=True,
@@ -70,5 +76,3 @@ if __name__ == '__main__':
     model.eval()
     PCE = eval(model, split, seq_length, n_cpu, True)
     print('Average PCE: {}'.format(PCE))
-
-
