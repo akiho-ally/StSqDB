@@ -2,6 +2,8 @@ import pickle
 import numpy as np
 from PIL import Image
 
+
+
 def main():
     # 1. movie_dicの読み込み
     with open("annotationed_movie.pkl", "rb") as annotationed_movie:
@@ -25,9 +27,22 @@ def main():
             images.append(img_resize)
             labels.append(label_id)
 
-        # TODO: 系列長について、padding or 長い動画の分割
-        data.append((images[:300], labels[:300], split_id))
+            index = 0
+            split_images = []
+            split_labels = []
+            for i in range(len(frames)):
+                if index+300 <=len(frames):
+                    split_image = images[index : index+300]
+                    split_label = labels[index : index+300]
+                    split_images.append(split_image)
+                    split_labels.append(split_label)
+                else:
+                    break
+                index += 10
 
+
+        # TODO: 系列長について、padding or 長い動画の分割
+        data.append((split_images, split_labels, split_id))
         print(mid)
 
     for i in range(1, 5):  
