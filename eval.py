@@ -8,6 +8,7 @@ import numpy as np
 from util import correct_preds
 
 
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def eval(model, split, seq_length, n_cpu, disp):
