@@ -80,7 +80,7 @@ if __name__ == '__main__':
         for sample in tqdm(data_loader):
             images, labels = sample['images'].to(device), sample['labels'].to(device)
             logits = model(images)       
-            labels = labels.view(bs*seq_length)  ##??
+            labels = labels.view(bs*seq_length)
             loss = criterion(logits, labels)
             optimizer.zero_grad()
             loss.backward() 
