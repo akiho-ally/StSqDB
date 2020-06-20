@@ -6,7 +6,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
-#TODO:  StsqDBを作る
+
 class StsqDB(Dataset):
     def __init__(self, data_file, vid_dir, seq_length, transform=None, train=True, padding=False):
         self.data_file = data_file
