@@ -66,26 +66,28 @@ def main():
 
 
         index = 0
-        split_images = []
-        split_labels = []
+        # split_images = []
+        # split_labels = []
         for i in range(len(images)):
             if index+300 <=len(images):
                 split_image = images[index : index+300]
                 split_label = labels[index : index+300]
             else:
                 break
-            split_images.append(split_image)
-            split_labels.append(split_label)
-            index += 10
+            data.append((split_image, split_label, split_id))
+            # split_images.append(split_image)
+            # split_labels.append(split_label)
 
+            index += 10
+        
 
 
 
         # TODO: 系列長について、padding or 長い動画の分割
-        data.append((split_images, split_labels, split_id))  ##len(data)=1  imagesに反転画像も色補正画像もまとめて入れてしまったからだと思われる。。
+            # data.append((split_images, split_labels, split_id))  ##len(data)=1  imagesに反転画像も色補正画像もまとめて入れてしまったからだと思われる。。
                                                              ## 動画１本　len(split_images)=411   len(split_labels)=411
         print(mid)
-    import pdb; pdb.set_trace() ##len(data)=40
+    import pdb; pdb.set_trace()##len(data)=40
     ##動画の本数が増えたというより、１本の動画が長くなった感じ（動画３回繰り返したものを合わせたので動画１本）
 
 
