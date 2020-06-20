@@ -20,7 +20,7 @@ def main():
         images = []
         labels = []
         split_id = np.random.randint(1, 5)
-        ##リサイズ
+        ##############リサイズ
         for frame in frames:
             filename = frame[0]
             label_id = frame[1]
@@ -31,9 +31,22 @@ def main():
             labels.append(label_id)
             
             ##len(images):1467
-        
-        ##反転処理
 
+        index = 0
+        for i in range(len(images)):
+            if index+300 <=len(images):
+                split_image = images[index : index+300]
+                split_label = labels[index : index+300]
+            else:
+                break
+            data.append((split_image, split_label, split_id))  ##split_id = 3
+            index += 10
+
+        # import pdb; pdb.set_trace()  ##len(data)=117
+        
+        ################反転処理
+        fliped_images = []
+        fliped_labels = []
         for frame in frames:  
             filename = frame[0]
             label_id = frame[1]
@@ -41,14 +54,27 @@ def main():
             img = Image.open(filepath)
             img_resize = np.array(img.resize((224, 224)))
             img_fliped = np.array(cv2.flip(img_resize, 1)) 
-            images.append(img_fliped)
-            labels.append(label_id)
+            fliped_images.append(img_fliped)
+            fliped_labels.append(label_id)
+
+
         
-             ##len(images):2934
+        index = 0
 
+        for i in range(len(fliped_images)):
+            if index+300 <=len(images):
+                split_fliped_image = fliped_images[index : index+300]
+                split_fliped_label = fliped_labels[index : index+300]
+            else:
+                break
+            data.append((split_fliped_image, split_fliped_label, split_id))  
+            index += 10
 
-        ##色補正
+        # import pdb; pdb.set_trace() ##len(data) = 234
 
+        ##############色補正
+        bgr_images = []
+        bgr_labels = []
         for frame in frames:  
             filename = frame[0]
             label_id = frame[1]
@@ -58,37 +84,31 @@ def main():
             img_hsv = cv2.cvtColor(img_resize,cv2.COLOR_BGR2HSV)
             img_hsv[:,:,(1)] = img_hsv[:,:,(1)]*0.5
             img_bgr = cv2.cvtColor(img_hsv,cv2.COLOR_HSV2BGR)
-            images.append(img_bgr)
-            labels.append(label_id)
+            bgr_images.append(img_bgr)
+            bgr_labels.append(label_id)
 
-            ##動画１本　len(images): 4401
 
 
 
         index = 0
-        # split_images = []
-        # split_labels = []
-        for i in range(len(images)):
+        for i in range(len(bgr_images)):
             if index+300 <=len(images):
-                split_image = images[index : index+300]
-                split_label = labels[index : index+300]
+                split_bgr_image = bgr_images[index : index+300]
+                split_bgr_label = bgr_labels[index : index+300]
             else:
                 break
-            data.append((split_image, split_label, split_id))
-            # split_images.append(split_image)
-            # split_labels.append(split_label)
-
+            data.append((split_bgr_image, split_bgr_label, split_id))
             index += 10
-        
+        #import pdb; pdb.set_trace()  ##len(data)=351
 
 
 
         # TODO: 系列長について、padding or 長い動画の分割
-            # data.append((split_images, split_labels, split_id))  ##len(data)=1  imagesに反転画像も色補正画像もまとめて入れてしまったからだと思われる。。
-                                                             ## 動画１本　len(split_images)=411   len(split_labels)=411
-        print(mid)
-    import pdb; pdb.set_trace()##len(data)=40
-    ##動画の本数が増えたというより、１本の動画が長くなった感じ（動画３回繰り返したものを合わせたので動画１本）
+            # data.append((split_images, split_labels, split_id))  
+        print('movie {}  len(data) = {} '.format(mid, len(data)) )
+
+    # import pdb; pdb.set_trace() ##len(data)=10197
+
 
 
     for i in range(1, 5):  
