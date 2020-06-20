@@ -8,7 +8,7 @@ from torchvision import transforms
 
 #TODO:  StsqDBを作る
 class StsqDB(Dataset):
-    def __init__(self, data_file, vid_dir, seq_length, transform=None, train=True):
+    def __init__(self, data_file, vid_dir, seq_length, transform=None, train=True, padding=False):
         # self.df = pd.read_pickle(data_file)
         self.data_file = data_file
         self.images, self.labels = self.load_data()
@@ -17,11 +17,16 @@ class StsqDB(Dataset):
         self.transform = transform
         self.train = train
 
+        seq_lengths = [ len(labels_ids) for label_ids in self.labels ]
+        self.max_seq_length = max(seq_lengths)
+        self.min_seq_length = min(seq_lengths)
+        self.padding = padding
+
+
     def __len__(self):
         with open(self.data_file, "rb") as f:  ##ここで持ってくるファイルは全体のやつ？？or train?? >> これはtrainだね。
             data = pickle.load(f)
         return len(data)
-        # return len(self.df)
      
     @property
     def element(self):
@@ -31,8 +36,8 @@ class StsqDB(Dataset):
         return self.element[id]
 
     def __getitem__(self, idx):
-        images = self.images[idx][:300]
-        labels = self.labels[idx][:300]
+        images = self.images[idx][:self.min_seq_length]
+        labels = self.labels[idx][:selg.min_seq_length]
 
         sample = { 'images':np.asarray(images), 'labels':np.asarray(labels) }
         if self.transform:
