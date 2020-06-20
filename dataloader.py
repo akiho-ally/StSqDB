@@ -9,7 +9,6 @@ from torchvision import transforms
 #TODO:  StsqDBを作る
 class StsqDB(Dataset):
     def __init__(self, data_file, vid_dir, seq_length, transform=None, train=True, padding=False):
-        # self.df = pd.read_pickle(data_file)
         self.data_file = data_file
         self.images, self.labels = self.load_data()
         self.vid_dir = vid_dir
@@ -22,9 +21,8 @@ class StsqDB(Dataset):
         self.min_seq_length = min(seq_lengths)
         self.padding = padding
 
-
     def __len__(self):
-        with open(self.data_file, "rb") as f:  ##ここで持ってくるファイルは全体のやつ？？or train?? >> これはtrainだね。
+        with open(self.data_file, "rb") as f:
             data = pickle.load(f)
         return len(data)
      
@@ -39,72 +37,18 @@ class StsqDB(Dataset):
         images = self.images[idx][:self.min_seq_length]
         labels = self.labels[idx][:selg.min_seq_length]
 
-        sample = { 'images':np.asarray(images), 'labels':np.asarray(labels) }
+        sample = { 'images': np.asarray(images), 'labels': np.asarray(labels) }
         if self.transform:
             sample = self.transform(sample)
         return sample
 
     def load_data(self):
-        # pklファイルからimg, labelを読み込む
-        with open(self.data_file, "rb") as f:  ##このファイルはtrain_split1をload中のはず。。あれ、ここは全部のやつか？？
+        """pklファイルからimg, labelを読み込む"""
+        with open(self.data_file, "rb") as f:
             data = pickle.load(f)
-        images = [ pair[0] for pair in data ]  ##len(images)=300
+        images = [ pair[0] for pair in data ]
         labels = [ pair[1] for pair in data ] 
         return images, labels 
-
-
-        # images = []
-        # labels = []
-        # for image,label in data:
-        #     images.append(image)
-        #     labels.append(label)
-
-        # data = [ [[[]], [[]]] , [1,2, 4,0, ],   [[[]], [[]]] , [1,2, 4,0, ],   [[[]], [[]]] , [1,2, 4,0, ] ....  ] 
-
-  
-    # def __old_getitem__(self, idx):
-    #     a = self.df.loc[idx, :]  # annotation info
-    #     events = a['events'] 
-    #     events -= events[0]  # now frame #s correspond to frames in preprocessed video clips
-    #     images, labels = [], []
-    #     cap = cv2.VideoCapture(osp.join(self.vid_dir, '{}.mp4'.format(a['id'])))
-
-    #     if self.train:
-    #         # random starting position, sample 'seq_length' frames
-    #         start_frame = np.random.randint(events[-1] + 1)  ##終了点フレーム＋１までの中でrandomな整数
-    #         cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)  ##Ture or False (start_frameから再生)
-    #         pos = start_frame
-            
-    #         while len(images) < self.seq_length:
-    #             ret, img = cap.read()
-    #             if ret:  ##True 
-    #                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    #                 images.append(img)
-    #                 if pos in events[1:-1]:  ##start_frameがAddless~Finishのいずれかのフレームと一致する場合
-    #                     labels.append(np.where(events[1:-1] == pos)[0][0])  ##(0~7)
-    #                 else:  
-    #                     labels.append(8)  ##No_event=8
-    #                 pos += 1
-    #             else:  ##False
-    #                 cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  ##0から再生
-    #                 pos = 0
-    #         cap.release()
-    #     else:  ##eval
-    #         # full clip
-    #         for pos in range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))):  ##総フレーム数
-    #             _, img = cap.read()
-    #             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    #             images.append(img)
-    #             if pos in events[1:-1]:  ##posがAddless~Finishのいずれかのフレームと一致する場合
-    #                 labels.append(np.where(events[1:-1] == pos)[0][0])
-    #             else:
-    #                 labels.append(8)
-    #         cap.release()
-
-    #     sample = {'images':np.asarray(images), 'labels':np.asarray(labels)}
-    #     if self.transform:
-    #         sample = self.transform(sample)
-    #     return sample
 
 
 class ToTensor(object):
@@ -146,9 +90,6 @@ if __name__ == '__main__':
         print('{} events: {}'.format(len(events), events)) ##8つのフレーム番号
     
 
-
-
-    
 #########################################################
 # class GolfDB(Dataset):
 #     def __init__(self, data_file, vid_dir, seq_length, transform=None, train=True):
