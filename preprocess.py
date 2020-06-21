@@ -1,6 +1,8 @@
 import pickle
 import numpy as np
+import cv2
 from PIL import Image
+from PIL import ImageEnhance
 
 
 
@@ -18,6 +20,7 @@ def main():
         images = []
         labels = []
         split_id = np.random.randint(1, 5)
+        ##############リサイズ
         for frame in frames:
             filename = frame[0]
             label_id = frame[1]
@@ -26,24 +29,87 @@ def main():
             img_resize = np.array(img.resize((224, 224)))
             images.append(img_resize)
             labels.append(label_id)
+            
+            ##len(images):1467
 
-            index = 0
-            split_images = []
-            split_labels = []
-            for i in range(len(frames)):
-                if index+300 <=len(frames):
-                    split_image = images[index : index+300]
-                    split_label = labels[index : index+300]
-                    split_images.append(split_image)
-                    split_labels.append(split_label)
-                else:
-                    break
-                index += 10
+        index = 0
+        for i in range(len(images)):
+            if index+300 <=len(images):
+                split_image = images[index : index+300]
+                split_label = labels[index : index+300]
+            else:
+                break
+            data.append((split_image, split_label, split_id))  ##split_id = 3
+            index += 10
+
+        # import pdb; pdb.set_trace()  ##len(data)=117
+        
+        ################反転処理
+        fliped_images = []
+        fliped_labels = []
+        for frame in frames:  
+            filename = frame[0]
+            label_id = frame[1]
+            filepath = "data/videos_40/img" +str( mid )+ '/' + filename
+            img = Image.open(filepath)
+            img_resize = np.array(img.resize((224, 224)))
+            img_fliped = np.array(cv2.flip(img_resize, 1)) 
+            fliped_images.append(img_fliped)
+            fliped_labels.append(label_id)
+
+
+        
+        index = 0
+
+        for i in range(len(fliped_images)):
+            if index+300 <=len(images):
+                split_fliped_image = fliped_images[index : index+300]
+                split_fliped_label = fliped_labels[index : index+300]
+            else:
+                break
+            data.append((split_fliped_image, split_fliped_label, split_id))  
+            index += 10
+
+        # import pdb; pdb.set_trace() ##len(data) = 234
+
+        ##############色補正
+        bgr_images = []
+        bgr_labels = []
+        for frame in frames:  
+            filename = frame[0]
+            label_id = frame[1]
+            filepath = "data/videos_40/img" +str( mid )+ '/' + filename
+            img = Image.open(filepath)
+            img_resize = np.array(img.resize((224, 224)))
+            img_hsv = cv2.cvtColor(img_resize,cv2.COLOR_BGR2HSV)
+            img_hsv[:,:,(1)] = img_hsv[:,:,(1)]*0.5
+            img_bgr = cv2.cvtColor(img_hsv,cv2.COLOR_HSV2BGR)
+            bgr_images.append(img_bgr)
+            bgr_labels.append(label_id)
+
+
+
+
+        index = 0
+        for i in range(len(bgr_images)):
+            if index+300 <=len(images):
+                split_bgr_image = bgr_images[index : index+300]
+                split_bgr_label = bgr_labels[index : index+300]
+            else:
+                break
+            data.append((split_bgr_image, split_bgr_label, split_id))
+            index += 10
+        #import pdb; pdb.set_trace()  ##len(data)=351
+
 
 
         # TODO: 系列長について、padding or 長い動画の分割
-        data.append((split_images, split_labels, split_id))
-        print(mid)
+            # data.append((split_images, split_labels, split_id))  
+        print('movie {}  len(data) = {} '.format(mid, len(data)) )
+
+    # import pdb; pdb.set_trace() ##len(data)=10197
+
+
 
     for i in range(1, 5):  
         ##評価
