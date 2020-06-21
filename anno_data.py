@@ -13,7 +13,7 @@ file_dict = {}
 for element_name in element_names:
     # 'Bracket', 'Change_edge'
     #dir_path = '/Users/akiho/projects/d-hacks/skate/dataset/train/' + element_name
-    dir_path = '/home/akiho/projects/StSqdb/data/dataset/train_all/' + element_name
+    dir_path = '/home/akiho/projects/StSqDB/data/dataset/train_all/' + element_name
     # '/Users/akiho/projects/d-hacks/skate/dataset/train/Bracket')
     files = sorted(os.listdir(dir_path))
     # [file, file, file, ..., .DS_store]
