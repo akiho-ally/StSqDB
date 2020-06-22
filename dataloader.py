@@ -79,7 +79,7 @@ if __name__ == '__main__':
 
     dataset = StsqDB(data_file='train_split_1.pkl',
                      vid_dir='data/videos_40/',
-                     seq_length=300,
+                     seq_length=100,
                      transform=transforms.Compose([ToTensor(), norm]),
                      train=False)
    
