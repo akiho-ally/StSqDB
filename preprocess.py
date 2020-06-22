@@ -4,6 +4,8 @@ import numpy as np
 import cv2
 from PIL import Image
 from PIL import ImageEnhance
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 
