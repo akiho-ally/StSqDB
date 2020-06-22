@@ -27,7 +27,7 @@ def main():
             label_id = frame[1]
             filepath = "data/videos_40/img" +str( mid )+ '/' + filename
             img = Image.open(filepath)
-            img_resize = np.array(img.resize((224, 224)))
+            img_resize = np.array(img.resize((160, 160)))
             images.append(img_resize)
             labels.append(label_id)
             
@@ -53,7 +53,7 @@ def main():
             label_id = frame[1]
             filepath = "data/videos_40/img" +str( mid )+ '/' + filename
             img = Image.open(filepath)
-            img_resize = np.array(img.resize((224, 224)))
+            img_resize = np.array(img.resize((160, 160)))
             img_fliped = np.array(cv2.flip(img_resize, 1)) 
             fliped_images.append(img_fliped)
             fliped_labels.append(label_id)
@@ -81,7 +81,7 @@ def main():
             label_id = frame[1]
             filepath = "data/videos_40/img" +str( mid )+ '/' + filename
             img = Image.open(filepath)
-            img_resize = np.array(img.resize((224, 224)))
+            img_resize = np.array(img.resize((160, 160)))
             img_hsv = cv2.cvtColor(img_resize,cv2.COLOR_BGR2HSV)
             img_hsv[:,:,(1)] = img_hsv[:,:,(1)]*0.5
             img_bgr = cv2.cvtColor(img_hsv,cv2.COLOR_HSV2BGR)
