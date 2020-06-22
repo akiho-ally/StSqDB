@@ -32,7 +32,7 @@ def correct_preds(probs, labels, tol=-1):
     
     if tol == -1:  ##許容誤差
         #tol = int(max(np.round((events[5] - events[0])/30), 1))  ##(impact-address)/fps
-        tol = 3
+        tol = 5
     for i in range(len(events)):
         preds[i] = np.argsort(probs[i,:])[-1]  ##probsのi列目をsortしたものの一番大きいインデックス？？  ##probs.shape:(300,13)
     deltas = np.abs(events-preds)  ##abs:絶対値
