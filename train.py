@@ -13,11 +13,11 @@ if __name__ == '__main__':
 
     # training configuration
     split = 1
-    iterations = 2000
+    iterations = 3000
     it_save = 100  # save model every 100 iterations
     n_cpu = 6
     seq_length = 300
-    bs = 1  # batch size
+    bs = 8  # batch size
     k = 10  # frozen layers
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
