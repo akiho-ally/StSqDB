@@ -17,7 +17,7 @@ if __name__ == '__main__':
     it_save = 100  # save model every 100 iterations
     n_cpu = 6
     seq_length = 100
-    bs = 64  # batch size
+    bs = 32  # batch size
     k = 10  # frozen layers
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
