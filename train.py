@@ -13,11 +13,11 @@ import argparse
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('split', default=1)
-    parser.add_argument('iteration', default=2000)
-    parser.add_argument('it_save', default=100)
-    parser.add_argument('batch_size', default=16)
-    parser.add_argument('seq_length', default=300) 
+    parser.add_argument('--split', default=1)
+    parser.add_argument('--iteration', default=2000)
+    parser.add_argument('--it_save', default=100)
+    parser.add_argument('--batch_size', default=16)
+    parser.add_argument('--seq_length', default=300) 
     args = parser.parse_args() 
     # これ以降、このファイル内では "args.iterration" で2000とか呼び出せるようになる
 
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     # TODO: vid_dirのpathをかえる。stsqの動画を切り出したimage全部が含まれているdirにする
     dataset = StsqDB(data_file='data/seq_length_{}/train_split_{}.pkl'.format(args.seq_length, args.split),
                      vid_dir='data/videos_40/',
-                     seq_length=seq_length,
+                     seq_length=int(seq_length),
                      transform=transforms.Compose([ToTensor(),
                                                    Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
                      train=True)
@@ -71,7 +71,7 @@ if __name__ == '__main__':
 
 
     data_loader = DataLoader(dataset,
-                             batch_size=bs,
+                             batch_size=int(bs),
                              shuffle=True,
                              num_workers=n_cpu,
                              drop_last=True)
@@ -94,11 +94,11 @@ if __name__ == '__main__':
 
     i = 0
 
-    while i < iterations:
+    while i < int(iterations):
         for sample in tqdm(data_loader):
             images, labels = sample['images'].to(device), sample['labels'].to(device)
             logits = model(images)       
-            labels = labels.view(bs*seq_length)  ##??
+            labels = labels.view(int(bs)*int(seq_length))  ##??
             loss = criterion(logits, labels)
             optimizer.zero_grad()
             loss.backward() 

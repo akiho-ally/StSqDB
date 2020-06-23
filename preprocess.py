@@ -9,8 +9,8 @@ import os
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('seq_length', default=300)
-    parser.add_argument('img_size', default=224) 
+    parser.add_argument('--seq_length', default=300)
+    parser.add_argument('--img_size', default=224) 
     args = parser.parse_args() 
 
     # 1. movie_dicの読み込み
@@ -40,9 +40,9 @@ def main():
 
         index = 0
         for i in range(len(images)):
-            if index+args.seq_length <=len(images):
-                split_image = images[index : index+args.seq_length]
-                split_label = labels[index : index+args.seq_length]
+            if index+int(args.seq_length) <=len(images):
+                split_image = images[index : index+int(args.seq_length)]
+                split_label = labels[index : index+int(args.seq_length)]
             else:
                 break
             data.append((split_image, split_label, split_id))  ##split_id = 3
@@ -68,9 +68,9 @@ def main():
         index = 0
 
         for i in range(len(fliped_images)):
-            if index+args.seq_length <=len(images):
-                split_fliped_image = fliped_images[index : index+args.seq_length]
-                split_fliped_label = fliped_labels[index : index+args.seq_length]
+            if index+int(args.seq_length) <=len(images):
+                split_fliped_image = fliped_images[index : index+int(args.seq_length)]
+                split_fliped_label = fliped_labels[index : index+int(args.seq_length)]
             else:
                 break
             data.append((split_fliped_image, split_fliped_label, split_id))  
@@ -98,9 +98,9 @@ def main():
 
         index = 0
         for i in range(len(bgr_images)):
-            if index+args.seq_length <=len(images):
-                split_bgr_image = bgr_images[index : index+args.seq_length]
-                split_bgr_label = bgr_labels[index : index+args.seq_length]
+            if index+int(args.seq_length) <=len(images):
+                split_bgr_image = bgr_images[index : index+int(args.seq_length)]
+                split_bgr_label = bgr_labels[index : index+int(args.seq_length)]
             else:
                 break
             data.append((split_bgr_image, split_bgr_label, split_id))
@@ -119,6 +119,7 @@ def main():
     
     if not os.path.exists('data/seq_length_{}'.format(args.seq_length)):
         os.mkdir('data/seq_length_{}'.format(args.seq_length))
+
 
     for i in range(1, 5):  
         ##評価

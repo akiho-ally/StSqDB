@@ -27,18 +27,33 @@ def correct_preds(probs, labels, tol=-1):
     :return: array indicating correct events in predicted sequence (8,)
     """
 
-    events = np.where(labels < 13)[0]
-    preds = np.zeros(len(events))
+    # events = np.where(labels < 13)[0]
+    # preds = np.zeros(len(events))
     
-    if tol == -1:  ##許容誤差
-        #tol = int(max(np.round((events[5] - events[0])/30), 1))  ##(impact-address)/fps
-        tol = 3
-    for i in range(len(events)):
-        preds[i] = np.argsort(probs[i,:])[-1]  ##probsのi列目をsortしたものの一番大きいインデックス？？  ##probs.shape:(300,13)
-    deltas = np.abs(events-preds)  ##abs:絶対値
-    correct = (deltas <= tol).astype(np.uint8)  #deltaが誤差以下なら1,誤差以上なら0
+    # if tol == -1:  ##許容誤差
+    #     #tol = int(max(np.round((events[5] - events[0])/30), 1))  ##(impact-address)/fps
+    #     tol = 3
+    # for i in range(len(events)):
+    #     preds[i] = np.argsort(probs[i,:])[-1]  ##probsのi列目をsortしたものの一番大きいインデックス？？  ##probs.shape:(300,13)
+    # deltas = np.abs(events-preds)  ##abs:絶対値
+    # correct = (deltas <= tol).astype(np.uint8)  #deltaが誤差以下なら1,誤差以上なら0
 
-    return events, preds, deltas, tol, correct
+
+    # return events, preds, deltas, tol, correct
+
+
+    preds = np.zeros(len(labels))
+    correct = []
+
+    for i in range(len(labels)):
+        preds[i] = np.argsort(probs[i,:])[-1] 
+
+    for i in range(len(labels)):
+        if labels[i] == preds[i]:
+            correct.append(1)
+        else:
+            correct.append(0)
+    return preds, correct
 
 
 def freeze_layers(num_freeze, net):

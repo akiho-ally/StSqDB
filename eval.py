@@ -7,21 +7,22 @@ import torch.nn.functional as F
 import numpy as np
 from util import correct_preds
 
+import argparse
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def eval(model, split, seq_length, bs, n_cpu, disp):
     
 
-    dataset = StsqDB(data_file='data/seq_length_{}/val_split_{}.pkl'.format(seq_length, split),
+    dataset = StsqDB(data_file='data/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
                      vid_dir='data/videos_40/',
-                     seq_length=seq_length,
+                     seq_length=int(seq_length),
                      transform=transforms.Compose([ToTensor(),
                                                    Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
                      train=False)
 
     data_loader = DataLoader(dataset,
-                             batch_size=1,
+                             batch_size=int(bs),
                              shuffle=False,
                              num_workers=n_cpu,
                              drop_last=False)
@@ -30,13 +31,14 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
 
     for i, sample in enumerate(data_loader):
         images, labels = sample['images'].to(device), sample['labels'].to(device)
-        logits = model(images)       
-        probs = F.softmax(logits.data, dim=1).view(bs*seq_length, -1)    
-        labels = labels.view(bs*seq_length)
-        _, _, _, _, c = correct_preds(probs, labels.squeeze())
+        logits = model(images) 
+        probs = F.softmax(logits.data, dim=1)  ##確率
+        labels = labels.view(int(bs)*int(seq_length))
+        # _,_,_, _, c = correct_preds(probs, labels.squeeze())
+        preds, c = correct_preds(probs, labels.squeeze())
         if disp:
             print(i, c)
-        correct.append(c)
+        correct.extend(c)
 
         # images, labels = sample['images'], sample['labels']
         # # full samples do not fit into GPU memory so evaluate sample in 'seq_length' batches
@@ -63,9 +65,10 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('split', default=1)
-    parser.add_argument('batch_size', default=16)
-    parser.add_argument('seq_length', default=300) 
+    parser.add_argument('--split', default=1)
+    parser.add_argument('--batch_size', default=16)
+    parser.add_argument('--seq_length', default=300) 
+    parser.add_argument('--model_num', default=800)
     args = parser.parse_args() 
 
 
@@ -82,7 +85,7 @@ if __name__ == '__main__':
                           bidirectional=True,
                           dropout=False)
 
-    save_dict = torch.load('models/swingnet_800.pth.tar')
+    save_dict = torch.load('models/swingnet_{}.pth.tar'.format(args.model_num))
     model.load_state_dict(save_dict['model_state_dict'])
     model.to(device)
     model.eval()
