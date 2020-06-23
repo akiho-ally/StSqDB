@@ -3,10 +3,15 @@ import numpy as np
 import cv2
 from PIL import Image
 from PIL import ImageEnhance
-
+import argparse
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('seq_length', default=300)
+    parser.add_argument('img_size', default=224) 
+    args = parser.parse_args() 
+
     # 1. movie_dicの読み込み
     with open("annotationed_movie.pkl", "rb") as annotationed_movie:
         movie_dic = pickle.load(annotationed_movie)
@@ -34,9 +39,9 @@ def main():
 
         index = 0
         for i in range(len(images)):
-            if index+300 <=len(images):
-                split_image = images[index : index+300]
-                split_label = labels[index : index+300]
+            if index+args.seq_length <=len(images):
+                split_image = images[index : index+args.seq_length]
+                split_label = labels[index : index+args.seq_length]
             else:
                 break
             data.append((split_image, split_label, split_id))  ##split_id = 3
@@ -62,9 +67,9 @@ def main():
         index = 0
 
         for i in range(len(fliped_images)):
-            if index+300 <=len(images):
-                split_fliped_image = fliped_images[index : index+300]
-                split_fliped_label = fliped_labels[index : index+300]
+            if index+args.seq_length <=len(images):
+                split_fliped_image = fliped_images[index : index+args.seq_length]
+                split_fliped_label = fliped_labels[index : index+args.seq_length]
             else:
                 break
             data.append((split_fliped_image, split_fliped_label, split_id))  
@@ -92,9 +97,9 @@ def main():
 
         index = 0
         for i in range(len(bgr_images)):
-            if index+300 <=len(images):
-                split_bgr_image = bgr_images[index : index+300]
-                split_bgr_label = bgr_labels[index : index+300]
+            if index+args.seq_length <=len(images):
+                split_bgr_image = bgr_images[index : index+args.seq_length]
+                split_bgr_label = bgr_labels[index : index+args.seq_length]
             else:
                 break
             data.append((split_bgr_image, split_bgr_label, split_id))
@@ -125,9 +130,9 @@ def main():
                 train_split.append((movie_data[0], movie_data[1]))
         # TODO: movieをシャッフル
   
-        with open("val_split_{:1d}.pkl".format(i), "wb") as f:
+        with open("data/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
             pickle.dump(val_split, f)
-        with open("train_split_{:1d}.pkl".format(i), "wb") as f:
+        with open("data/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
             pickle.dump(train_split, f)
         print("finish {}".format(i))
 
