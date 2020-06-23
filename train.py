@@ -1,4 +1,4 @@
-from comet_ml import Experiment
+# from comet_ml import Experiment
 from tqdm import tqdm
 from dataloader import StsqDB, Normalize, ToTensor
 from model import EventDetector
@@ -11,13 +11,13 @@ import os
 
 
 if __name__ == '__main__':
-    experiment = Experiment(api_key='d7Xjw6KSK6KL7pUOhXJvONq9j', project_name='stsqdb')
-    hyper_params = {
-    'batch_size': 16,
-    'iterations' : 3000,
-    }
+#     experiment = Experiment(api_key='d7Xjw6KSK6KL7pUOhXJvONq9j', project_name='stsqdb')
+#     hyper_params = {
+#     'batch_size': 16,
+#     'iterations' : 3000,
+#     }
 
-    experiment.log_parameters(hyper_params)
+#     experiment.log_parameters(hyper_params)
 
     # training configuration
     split = 1
@@ -102,6 +102,6 @@ if __name__ == '__main__':
                             'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(i))
             if i == iterations:
                 break                
-        experiment.log_metrics("train_loss", losses, step=iterations)
+#         experiment.log_metrics("train_loss", losses, step=iterations)
 
 
