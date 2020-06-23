@@ -19,6 +19,7 @@ if __name__ == '__main__':
 
     experiment.log_parameters(hyper_params)
 
+
     # training configuration
     split = 1
     iterations = 6000
