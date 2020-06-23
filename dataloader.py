@@ -31,8 +31,8 @@ class StsqDB(Dataset):
         return self.element[id]
 
     def __getitem__(self, idx):
-        images = self.images[idx][:300]
-        labels = self.labels[idx][:300]
+        images = self.images[idx][:self.seq_length]
+        labels = self.labels[idx][:self.seq_length]
 
         sample = { 'images':np.asarray(images), 'labels':np.asarray(labels) }
         if self.transform:
