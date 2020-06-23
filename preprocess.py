@@ -4,6 +4,7 @@ import cv2
 from PIL import Image
 from PIL import ImageEnhance
 import argparse
+import os
 
 
 def main():
@@ -115,6 +116,9 @@ def main():
     # import pdb; pdb.set_trace() ##len(data)=10197
 
 
+    
+    if not os.path.exists('data/seq_length_{}'.format(args.seq_length)):
+        os.mkdir('data/seq_length_{}'.format(args.seq_length))
 
     for i in range(1, 5):  
         ##評価
