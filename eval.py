@@ -22,7 +22,7 @@ def eval(model, split, seq_length, n_cpu, disp):
                      train=False)
 
     data_loader = DataLoader(dataset,
-                             batch_size=1,
+                             batch_size=16,
                              shuffle=False,
                              num_workers=n_cpu,
                              drop_last=False)
@@ -60,7 +60,7 @@ def eval(model, split, seq_length, n_cpu, disp):
 if __name__ == '__main__':
 
     split = 1
-    seq_length = 300
+    seq_length = 100
     n_cpu = 6
 
     model = EventDetector(pretrain=True,
@@ -71,7 +71,7 @@ if __name__ == '__main__':
                           bidirectional=True,
                           dropout=False)
 
-    save_dict = torch.load('models/swingnet_1800.pth.tar')
+    save_dict = torch.load('models/swingnet_400.pth.tar')
     model.load_state_dict(save_dict['model_state_dict'])
     model.to(device)
     model.eval()
