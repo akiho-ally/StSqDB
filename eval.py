@@ -22,7 +22,7 @@ def eval(model, split, seq_length, n_cpu, disp):
                      train=False)
 
     data_loader = DataLoader(dataset,
-                             batch_size=16,
+                             batch_size=8,
                              shuffle=False,
                              num_workers=n_cpu,
                              drop_last=False)
@@ -49,9 +49,7 @@ def eval(model, split, seq_length, n_cpu, disp):
         _, _, _, _, c = correct_preds(probs, labels.squeeze())
         if disp:
             print(i, c)
-            print(np.mean(c))
         correct.append(c)
-        print(correct)
 
     PCE = np.mean(correct)
     return PCE
