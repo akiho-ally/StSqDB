@@ -8,13 +8,9 @@ import numpy as np
 from util import correct_preds
 
 
-
-
-
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-def eval(model, split, seq_length, n_cpu, disp):
+def eval(model, split, seq_length, bs, n_cpu, disp):
     
 
     dataset = StsqDB(data_file='val_split_{}.pkl'.format(split),
@@ -33,35 +29,50 @@ def eval(model, split, seq_length, n_cpu, disp):
     correct = []
 
     for i, sample in enumerate(data_loader):
-        images, labels = sample['images'], sample['labels']
-
-        # full samples do not fit into GPU memory so evaluate sample in 'seq_length' batches
-        batch = 0
-        while batch * seq_length < images.shape[1]:
-            if (batch + 1) * seq_length > images.shape[1]:
-                image_batch = images[:, batch * seq_length:, :, :, :]
-            else:
-                image_batch = images[:, batch * seq_length:(batch + 1) * seq_length, :, :, :]
-            logits = model(image_batch.to(device))
-
-            if batch == 0:
-                probs = F.softmax(logits.data, dim=1).to(device).numpy()
-            else:
-                probs = np.append(probs, F.softmax(logits.data, dim=1).to(device).numpy(), 0)
-            batch += 1
+        images, labels = sample['images'].to(device), sample['labels'].to(device)
+        logits = model(images)       
+        probs = F.softmax(logits.data, dim=1).view(bs*seq_length, -1)    
+        labels = labels.view(bs*seq_length)
         _, _, _, _, c = correct_preds(probs, labels.squeeze())
         if disp:
             print(i, c)
         correct.append(c)
+        
+        # images, labels = sample['images'], sample['labels']
+        # # full samples do not fit into GPU memory so evaluate sample in 'seq_length' batches
+        # batch = 0
+        # while batch * seq_length < images.shape[1]:
+        #     if (batch + 1) * seq_length > images.shape[1]:
+        #         image_batch = images[:, batch * seq_length:, :, :, :]
+        #     else:
+        #         image_batch = images[:, batch * seq_length:(batch + 1) * seq_length, :, :, :]
+        #     logits = model(image_batch.to(device))
+
+        #     if batch == 0:
+        #         probs = F.softmax(logits.data, dim=1).to(device).numpy()
+        #     else:
+        #         probs = np.append(probs, F.softmax(logits.data, dim=1).to(device).numpy(), 0)
+        #     batch += 1
+        # _, _, _, _, c = correct_preds(probs, labels.squeeze())
+        # if disp:
+        #     print(i, c)
+        # correct.append(c)
     PCE = np.mean(correct)
     return PCE
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('split', default=1)
+    parser.add_argument('batch_size', default=16)
+    parser.add_argument('seq_length', default=300) 
+    args = parser.parse_args() 
 
-    split = 1
-    seq_length = 300
+
+    split = args.split
+    seq_length = args.seq_length
     n_cpu = 6
+    bs = args.batch_size
 
     model = EventDetector(pretrain=True,
                           width_mult=1.,
@@ -75,5 +86,5 @@ if __name__ == '__main__':
     model.load_state_dict(save_dict['model_state_dict'])
     model.to(device)
     model.eval()
-    PCE = eval(model, split, seq_length, n_cpu, True)
+    PCE = eval(model, split, seq_length, bs, n_cpu, True)
     print('Average PCE: {}'.format(PCE))
