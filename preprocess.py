@@ -37,7 +37,7 @@ def main():
 
         index = 0
         for i in range(len(images)):
-            if index+300 <=len(images):
+            if index+100 <=len(images):
                 split_image = images[index : index+100]
                 split_label = labels[index : index+100]
             else:
@@ -65,7 +65,7 @@ def main():
         index = 0
 
         for i in range(len(fliped_images)):
-            if index+300 <=len(images):
+            if index+100 <=len(images):
                 split_fliped_image = fliped_images[index : index+100]
                 split_fliped_label = fliped_labels[index : index+100]
             else:
@@ -95,7 +95,7 @@ def main():
 
         index = 0
         for i in range(len(bgr_images)):
-            if index+300 <=len(images):
+            if index+100 <=len(images):
                 split_bgr_image = bgr_images[index : index+100]
                 split_bgr_label = bgr_labels[index : index+100]
             else:
