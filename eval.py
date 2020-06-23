@@ -22,7 +22,7 @@ def eval(model, split, seq_length, n_cpu, disp):
                      train=False)
 
     data_loader = DataLoader(dataset,
-                             batch_size=8,
+                             batch_size=1,
                              shuffle=False,
                              num_workers=n_cpu,
                              drop_last=False)
