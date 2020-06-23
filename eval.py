@@ -13,7 +13,7 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 def eval(model, split, seq_length, bs, n_cpu, disp):
     
 
-    dataset = StsqDB(data_file='val_split_{}.pkl'.format(split),
+    dataset = StsqDB(data_file='data/seq_length_{}/val_split_{}.pkl'.format(seq_length, split),
                      vid_dir='data/videos_40/',
                      seq_length=seq_length,
                      transform=transforms.Compose([ToTensor(),
@@ -37,7 +37,7 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
         if disp:
             print(i, c)
         correct.append(c)
-        
+
         # images, labels = sample['images'], sample['labels']
         # # full samples do not fit into GPU memory so evaluate sample in 'seq_length' batches
         # batch = 0
