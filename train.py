@@ -1,3 +1,4 @@
+from comet_ml import Experiment
 from tqdm import tqdm
 from dataloader import StsqDB, Normalize, ToTensor
 from model import EventDetector
@@ -11,13 +12,21 @@ import os
 
 if __name__ == '__main__':
 
+    experiment = Experiment(api_key='d7Xjw6KSK6KL7pUOhXJvONq9j', project_name='stsqdb')
+    hyper_params = {
+    'batch_size': 8,
+    'iterations' : 3000,
+    }
+
+    experiment.log_parameters(hyper_params)
+
     # training configuration
     split = 1
-    iterations = 2000
+    iterations = 3000
     it_save = 100  # save model every 100 iterations
     n_cpu = 6
     seq_length = 300
-    bs = 1  # batch size
+    bs = 8  # batch size
     k = 10  # frozen layers
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -87,6 +96,8 @@ if __name__ == '__main__':
             losses.update(loss.item(), images.size(0))
             optimizer.step()
 
+            
+
             print('Iteration: {}\tLoss: {loss.val:.4f} ({loss.avg:.4f})'.format(i, loss=losses))
             i += 1
             if i % it_save == 0:
@@ -95,5 +106,4 @@ if __name__ == '__main__':
             if i == iterations:
                 break
 
-
-
+        experiment.log_metrics("train_loss", losses, step=iterations)

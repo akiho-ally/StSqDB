@@ -9,6 +9,9 @@ from util import correct_preds
 
 
 
+
+
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def eval(model, split, seq_length, n_cpu, disp):
@@ -49,10 +52,7 @@ def eval(model, split, seq_length, n_cpu, disp):
         _, _, _, _, c = correct_preds(probs, labels.squeeze())
         if disp:
             print(i, c)
-            print(np.mean(c))
         correct.append(c)
-        print(correct)
-
     PCE = np.mean(correct)
     return PCE
 
@@ -71,7 +71,7 @@ if __name__ == '__main__':
                           bidirectional=True,
                           dropout=False)
 
-    save_dict = torch.load('models/swingnet_1800.pth.tar')
+    save_dict = torch.load('models/swingnet_800.pth.tar')
     model.load_state_dict(save_dict['model_state_dict'])
     model.to(device)
     model.eval()
