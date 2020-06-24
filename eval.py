@@ -25,7 +25,7 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
                              batch_size=int(bs),
                              shuffle=False,
                              num_workers=n_cpu,
-                             drop_last=False)
+                             drop_last=True)
 
     correct = []
 

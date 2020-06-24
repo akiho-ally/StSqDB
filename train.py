@@ -25,6 +25,7 @@ if __name__ == '__main__':
     hyper_params = {
     'batch_size': args.batch_size,
     'iterations' : args.iteration,
+    'seq_length' : args.seq_length,
     }
 
     experiment.log_parameters(hyper_params)
@@ -92,9 +93,10 @@ if __name__ == '__main__':
     if not os.path.exists('models'):
         os.mkdir('models')
 
-    i = 0
 
-    while i < int(iterations):
+    epoch = 0
+    for epoch in range(int(iterations)):
+    # while i < int(iterations):
         for sample in tqdm(data_loader):
             images, labels = sample['images'].to(device), sample['labels'].to(device)
             logits = model(images)       
@@ -107,12 +109,12 @@ if __name__ == '__main__':
 
             
 
-            print('Iteration: {}\tLoss: {loss.val:.4f} ({loss.avg:.4f})'.format(i, loss=losses))
-            i += 1
-            if i % it_save == 0:
+            print('epoch: {}\tLoss: {loss.val:.4f} ({loss.avg:.4f})'.format(epoch, loss=losses))
+            epoch += 1
+            if epoch % it_save == 0:
                 torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                            'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(i))
-            if i == iterations:
+                            'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(epoch))
+            if epoch == iterations:
                 break
 
-        experiment.log_metrics("train_loss", losses, step=iterations)
+        experiment.log_metrics("train_loss", losses, step=epoch)
