@@ -6,6 +6,7 @@ from dataloader import StsqDB, ToTensor, Normalize
 import torch.nn.functional as F
 import numpy as np
 from util import correct_preds
+import collections
 
 import argparse
 
@@ -28,37 +29,28 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
                              drop_last=True)
 
     correct = []
+    all_labels = []
+    all_c_labels = []
 
     for i, sample in enumerate(data_loader):
         images, labels = sample['images'].to(device), sample['labels'].to(device)
         logits = model(images) 
         probs = F.softmax(logits.data, dim=1)  ##確率
         labels = labels.view(int(bs)*int(seq_length))
-        # _,_,_, _, c = correct_preds(probs, labels.squeeze())
-        preds, c = correct_preds(probs, labels.squeeze())
+        labels, c_labels, c = correct_preds(probs, labels.squeeze())
         if disp:
             print(i, c)
         correct.extend(c)
+        all_labels.extend(labels)  ##全てのlabelsをlistで結合
+        all_c_labels.extend(c_labels)  ##正解したlabelsをlistで結合
 
-        # images, labels = sample['images'], sample['labels']
-        # # full samples do not fit into GPU memory so evaluate sample in 'seq_length' batches
-        # batch = 0
-        # while batch * seq_length < images.shape[1]:
-        #     if (batch + 1) * seq_length > images.shape[1]:
-        #         image_batch = images[:, batch * seq_length:, :, :, :]
-        #     else:
-        #         image_batch = images[:, batch * seq_length:(batch + 1) * seq_length, :, :, :]
-        #     logits = model(image_batch.to(device))
+    ##0~12がいくつあったかを数え、dict型で保存
+    all_labels_count = collections.Counter(all_labels)  ##Counter({12: 296, 11: 72, 6: 66, 3: 55, 0: 48, 1: 48, 8: 11, 9: 4})
+    all_c_labels_count = collections.Counter(all_c_labels)  ##Counter({12: 186, 6: 8})  ##（本当はもっといっぱいある）
 
-        #     if batch == 0:
-        #         probs = F.softmax(logits.data, dim=1).to(device).numpy()
-        #     else:
-        #         probs = np.append(probs, F.softmax(logits.data, dim=1).to(device).numpy(), 0)
-        #     batch += 1
-        # _, _, _, _, c = correct_preds(probs, labels.squeeze())
-        # if disp:
-        #     print(i, c)
-        # correct.append(c)
+    ##やりたいこと
+    ##同じkeyのvalueで割り算 (all_labels_count/all_c_labels_count)
+
     PCE = np.mean(correct)
     return PCE
 
@@ -68,7 +60,7 @@ if __name__ == '__main__':
     parser.add_argument('--split', default=1)
     parser.add_argument('--batch_size', default=16)
     parser.add_argument('--seq_length', default=300) 
-    parser.add_argument('--model_num', default=800)
+    parser.add_argument('--model_num', default=900)
     args = parser.parse_args() 
 
 
