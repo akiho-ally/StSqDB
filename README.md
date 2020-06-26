@@ -18,25 +18,23 @@ iteration,bs,seq_lengthを変えて実験中
 
 
 ## Evaluate
-
+エレメントごとに精度を出したい
 
 
 ## これまでの精度
-iteration=2000, bs=1, 動画を切り分けない
- * Average PCE: 0.03138888888888889
+Average PCE: 0.34063427299703264
+ *iteration=8000 bs=16, seq=100
+***Average PCE: 0.5135715914272686
+ *iteration=8000 bs=8, seq=300***
+Average PCE: 0.4110422848664688
+ *iteration=6000, bs=16 seq=100
+Average PCE: 0.18964634146341464
+ iteration=6000, bs= 32 seq=50
 
-iteration=2000, bs=1, frame=300で動画を切り分け 
- * Average PCE: 0.02068034188034188
- 
-iteration=3000, bs=8, frame=300,
- * Average PCE: 0.036983475783475786
- 
-iteration=6000, bs=16, frame=100
- * Average PCE: 0.1056962962962963
 
- ## 今やってること
- ### pallas
- iteration=6000, bs=32, frame=50
- ### glacus
+## 今やってること
+### pallas
 
+### glacus
+iteration=8000, bs=4, seq=500 でtrain中
 
