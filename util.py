@@ -21,23 +21,6 @@ class AverageMeter(object):
 def correct_preds(probs, labels, tol=-1):
 
 
-    element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
-
-
-    # events = np.where(labels < 13)[0]
-    # preds = np.zeros(len(events))
-    
-    # if tol == -1:  ##許容誤差
-    #     #tol = int(max(np.round((events[5] - events[0])/30), 1))  ##(impact-address)/fps
-    #     tol = 3
-    # for i in range(len(events)):
-    #     preds[i] = np.argsort(probs[i,:])[-1]  ##probsのi列目をsortしたものの一番大きいインデックス？？  ##probs.shape:(300,13)
-    # deltas = np.abs(events-preds)  ##abs:絶対値
-    # correct = (deltas <= tol).astype(np.uint8)  #deltaが誤差以下なら1,誤差以上なら0
-
-
-    # return events, preds, deltas, tol, correct
-
 
     preds = np.zeros(len(labels))
     correct = []
