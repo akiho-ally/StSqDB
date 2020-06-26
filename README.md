@@ -21,15 +21,15 @@ iteration,bs,seq_lengthを変えて実験中
 エレメントごとに精度を出したい
 
 
-## これまでの精度
+## これまでの精度  
 Average PCE: 0.34063427299703264  
- * iteration=8000 bs=16, seq=100  
-Average PCE: 0.5135715914272686  
- * iteration=8000 bs=8, seq=300    
+ ・iteration=8000 bs=16, seq=100  
+***Average PCE: 0.5135715914272686  
+ ・iteration=8000 bs=8, seq=300***      
 Average PCE: 0.4110422848664688  
- * iteration=6000, bs=16 seq=100  
+ ・iteration=6000, bs=16 seq=100  
 Average PCE: 0.18964634146341464  
- * iteration=6000, bs= 32 seq=50  
+ ・iteration=6000, bs= 32 seq=50  
 
 
 ## 今やってること
