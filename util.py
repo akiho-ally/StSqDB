@@ -19,13 +19,10 @@ class AverageMeter(object):
 
 
 def correct_preds(probs, labels, tol=-1):
-    """
-    Gets correct events in full-length sequence using tolerance based on number of frames from address to impact.
-    Used during validation only.
-    :param probs: (sequence_length, 9)
-    :param labels: (sequence_length,)
-    :return: array indicating correct events in predicted sequence (8,)
-    """
+
+
+    element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
+
 
     # events = np.where(labels < 13)[0]
     # preds = np.zeros(len(events))
