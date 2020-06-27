@@ -30,6 +30,8 @@ Average PCE: 0.4110422848664688
  ・iteration=6000, bs=16 seq=100  
 Average PCE: 0.18964634146341464  
  ・iteration=6000, bs= 32 seq=50  
+***Average PCE: 0.5131084967320262  
+ ・iteration=8000 seq=500 bs=4***
 
 
 ## 今やってること
