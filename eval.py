@@ -27,16 +27,20 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
                              drop_last=False)
 
     correct = []
+    element_correct = [ [] for i in range(13) ]
 
     for i, sample in enumerate(data_loader):
         images, labels = sample['images'].to(device), sample['labels'].to(device)
         logits = model(images)       
         probs = F.softmax(logits.data, dim=1).view(bs*seq_length, -1)    
         labels = labels.view(bs*seq_length)
-        _, _, _, _, c = correct_preds(probs, labels.squeeze())
+        _, _, _, _, c, element_c = correct_preds(probs, labels.squeeze())
+
         if disp:
             print(i, c)
         correct.append(c)
+        for j in range(len(element_c)):
+            element_correct[j].append(element_c[j])
         
         # images, labels = sample['images'], sample['labels']
         # # full samples do not fit into GPU memory so evaluate sample in 'seq_length' batches
@@ -58,7 +62,8 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
         #     print(i, c)
         # correct.append(c)
     PCE = np.mean(correct)
-    return PCE
+    element_PCE = [ np.mean(element_c) for element_correct in element_c ]
+    return PCE, element_PCE
 
 
 if __name__ == '__main__':
@@ -86,5 +91,13 @@ if __name__ == '__main__':
     model.load_state_dict(save_dict['model_state_dict'])
     model.to(device)
     model.eval()
-    PCE = eval(model, split, seq_length, bs, n_cpu, True)
+    PCE, element_PCE = eval(model, split, seq_length, bs, n_cpu, True)
     print('Average PCE: {}'.format(PCE))
+
+    # TODO: 
+    element_names = ['Bracket', 'Change_edge', 'Chasse','Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
+
+
+    for j in range(len(element_PCE)):
+        element_name = element_names[j]
+        print('{}: {}'.format(element_name, element_PCE[j]))

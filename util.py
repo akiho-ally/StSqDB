@@ -27,16 +27,25 @@ def correct_preds(probs, labels, tol=-1):
     :return: array indicating correct events in predicted sequence (8,)
     """
 
-    events = np.where(labels < 13)[0]
+    events, _  = np.where(labels < 13)
     preds = np.zeros(len(events))
+    each_element_preds = np.zeros(13)
     
     if tol == -1:  ##許容誤差
         #tol = int(max(np.round((events[5] - events[0])/30), 1))  ##(impact-address)/fps
         tol = 3
+
     for i in range(len(events)):
         preds[i] = np.argsort(probs[i,:])[-1]  ##probsのi列目をsortしたものの一番大きいインデックス？？  ##probs.shape:(300,13)
+
     deltas = np.abs(events-preds)  ##abs:絶対値
     correct = (deltas <= tol).astype(np.uint8)  #deltaが誤差以下なら1,誤差以上なら0
+    
+    for i in range(len(events)):
+        label_id = events[i]
+        if correct[i] == 1:
+            each_element_preds[int(label_id)] += 1
+
 
     return events, preds, deltas, tol, correct
 
