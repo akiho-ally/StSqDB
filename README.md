@@ -36,7 +36,7 @@ Average PCE: 0.18964634146341464
 
 ## 今やってること
 ### pallas
-
+iteration=8000, bs=4, seq=300 eval(bs=2)
 ### glacus
-iteration=8000, bs=4, seq=500 でtrain中
+iteration=8000, bs=4, seq=500 でeval
 
