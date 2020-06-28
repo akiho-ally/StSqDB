@@ -31,7 +31,22 @@ Average PCE: 0.4110422848664688
 Average PCE: 0.18964634146341464  
  ・iteration=6000, bs= 32 seq=50  
 ***Average PCE: 0.5131084967320262  
- ・iteration=8000 seq=500 bs=4***
+ ・iteration=8000 seq=500 bs=4***  
+Average PCE: 0.45616735066119474  
+Bracket: 0.013962709862482072  
+Change_edge: 0.0  
+Chasse: 0.0  
+Choctaw: 0.3495014820803018  
+Counter_turn: 0.16201384413910658  
+Cross_roll: 0.0  
+Loop: 0.008901278947497126  
+Mohawk: 0.0  
+Rocker_turn: 0.04001167449388416  
+Three_turn: 0.042524592167165635  
+Toe_step: 0.19012155452833418  
+Twizzle: 0.21124867484476753  
+No_element: 0.6380905097137023  
+ ・ iteration=8000 bs=4 seq=300  
 
 
 ## 今やってること
