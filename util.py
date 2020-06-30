@@ -1,5 +1,4 @@
 import numpy as np
-import torch
 
 class AverageMeter(object):
     """Computes and stores the average and current value"""
@@ -21,10 +20,10 @@ class AverageMeter(object):
 
 def correct_preds(probs, labels, tol=-1):
 
-    labels = labels.to('cpu').detach().numpy().copy()  ##labelsをnumpyに変換
-    preds= np.zeros(len(labels))
+    preds = np.zeros(len(labels))
     correct = []
-    correct_labels = []
+    each_element_sum = np.zeros(13)
+    each_element_preds = np.zeros(13)
 
     for i in range(len(labels)):
         preds[i] = np.argsort(probs[i,:])[-1] 
@@ -32,11 +31,17 @@ def correct_preds(probs, labels, tol=-1):
     for i in range(len(labels)):
         if labels[i] == preds[i]:
             correct.append(1)
-            correct_labels.append(labels[i])
         else:
             correct.append(0)
 
-    return labels, correct_labels, correct
+    for i in range(len(labels)):
+        label_id = labels[i]
+        each_element_sum[int(label_id)] += 1
+        if correct[i] == 1:
+            each_element_preds[int(label_id)] += 1
+
+        
+    return preds, correct , each_element_preds, each_element_sum
 
 
 def freeze_layers(num_freeze, net):

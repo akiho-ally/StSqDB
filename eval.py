@@ -29,30 +29,29 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
                              drop_last=True)
 
     correct = []
-    all_labels = []
-    all_c_labels = []
+    element_correct = [ [] for i in range(13) ]
+    element_sum = [ [] for i in range(13)]
 
     for i, sample in enumerate(data_loader):
         images, labels = sample['images'].to(device), sample['labels'].to(device)
         logits = model(images) 
         probs = F.softmax(logits.data, dim=1)  ##確率
         labels = labels.view(int(bs)*int(seq_length))
-        labels, c_labels, c = correct_preds(probs, labels.squeeze())
+        _, c, element_c, element_s = correct_preds(probs, labels.squeeze())
         if disp:
             print(i, c)
-        correct.extend(c)
-        all_labels.extend(labels)  ##全てのlabelsをlistで結合
-        all_c_labels.extend(c_labels)  ##正解したlabelsをlistで結合
-
-    ##0~12がいくつあったかを数え、dict型で保存
-    all_labels_count = collections.Counter(all_labels)  ##Counter({12: 296, 11: 72, 6: 66, 3: 55, 0: 48, 1: 48, 8: 11, 9: 4})
-    all_c_labels_count = collections.Counter(all_c_labels)  ##Counter({12: 186, 6: 8})  ##（本当はもっといっぱいある）
-
-    ##やりたいこと
-    ##同じkeyのvalueで割り算 (all_labels_count/all_c_labels_count)
+        correct.append(c)
+        for j in range(len(element_c)):
+            element_correct[j].append(element_c[j])
+        for j in range(len(element_s)):
+            element_sum[j].append(element_s[j])
 
     PCE = np.mean(correct)
-    return PCE
+    all_element_correct = np.sum(element_correct, axis=1)
+    all_element_sum = np.sum(element_sum, axis=1)
+    element_PCE = all_element_correct / all_element_sum
+    return PCE, element_PCE, all_element_correct, all_element_sum
+
 
 
 if __name__ == '__main__':
@@ -81,5 +80,13 @@ if __name__ == '__main__':
     model.load_state_dict(save_dict['model_state_dict'])
     model.to(device)
     model.eval()
-    PCE = eval(model, split, seq_length, bs, n_cpu, True)
+    PCE, element_PCE, all_element_correct, all_element_sum = eval(model, split, seq_length, bs, n_cpu, True)
     print('Average PCE: {}'.format(PCE))
+
+    # TODO: 
+    element_names = ['Bracket', 'Change_edge', 'Chasse','Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
+
+
+    for j in range(len(element_PCE)):
+        element_name = element_names[j]
+        print('{}: {}  {}/{}'.format(element_name, element_PCE[j], all_element_correct[j], all_element_sum[j]))
