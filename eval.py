@@ -124,20 +124,15 @@ if __name__ == '__main__':
         plt.yticks(range(12), element_names)
         plt.xlabel('Predicted Category')
         plt.xticks(range(12), element_names)
-        if args.device is "cpu":
-            save_dir = '/Users/akiho/projects/d-hacks/stsqdb_argparse_glacus/'
-            plt.savefig(save_dir + 'fig_12.png')
-        else:
-            save_dir = '/home/akiho/projects/StSqDB/'
-            plt.savefig(save_dir + 'figure_12.png')
+
+        save_dir = '/home/akiho/projects/StSqDB/'
+        plt.savefig(save_dir + 'figure_12.png')
+
     else:
         plt.ylabel('Actual Category')
         plt.yticks(range(13), element_names)
         plt.xlabel('Predicted Category')
         plt.xticks(range(13), element_names)      
-        if args.device is "cpu":
-            save_dir = '/Users/akiho/projects/d-hacks/stsqdb_argparse_glacus/'
-            plt.savefig(save_dir + 'fig_13.png')
-        else:
-            save_dir = '/home/akiho/projects/StSqDB/'
-            plt.savefig(save_dir + 'figure_13.png')
+
+        save_dir = '/home/akiho/projects/StSqDB/'
+        plt.savefig(save_dir + 'figure_13.png')
