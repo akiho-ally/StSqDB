@@ -14,7 +14,7 @@ def main():
     args = parser.parse_args() 
 
     # 1. movie_dicの読み込み
-    with open("annotationed_movie.pkl", "rb") as annotationed_movie:
+    with open("annotationed_movie_12.pkl", "rb") as annotationed_movie:
         movie_dic = pickle.load(annotationed_movie)
 
         # 1つのmovie_data = (images, labels)
@@ -26,6 +26,7 @@ def main():
         images = []
         labels = []
         split_id = np.random.randint(1, 5)
+
         ##############リサイズ
         for frame in frames:
             filename = frame[0]
@@ -36,7 +37,7 @@ def main():
             images.append(img_resize)
             labels.append(label_id)
             
-            ##len(images):1467
+            #len(images):1467
 
         index = 0
         for i in range(len(images)):
@@ -47,8 +48,7 @@ def main():
                 break
             data.append((split_image, split_label, split_id))  ##split_id = 3
             index += 10
-
-        # import pdb; pdb.set_trace()  ##len(data)=117
+        # data.append((images, labels, split_id))
         
         ################反転処理
         fliped_images = []
@@ -77,6 +77,7 @@ def main():
             index += 10
 
         # import pdb; pdb.set_trace() ##len(data) = 234
+        # data.append((fliped_images, fliped_labels, split_id))
 
         ##############色補正
         bgr_images = []
@@ -107,6 +108,7 @@ def main():
             index += 10
         #import pdb; pdb.set_trace()  ##len(data)=351
 
+        # data.append((bgr_images, bgr_labels, split_id))
 
 
         # TODO: 系列長について、padding or 長い動画の分割
@@ -116,10 +118,13 @@ def main():
     # import pdb; pdb.set_trace() ##len(data)=10197
 
 
-    
-    if not os.path.exists('data/seq_length_{}'.format(args.seq_length)):
-        os.mkdir('data/seq_length_{}'.format(args.seq_length))
+ ###############################################################################   
+    # if not os.path.exists('data/seq_length_{}'.format(args.seq_length)):
+    #     os.mkdir('data/seq_length_{}'.format(args.seq_length))
+    if not os.path.exists('data/no_ele/seq_length_{}'.format(args.seq_length)):
+        os.mkdir('data/no_ele/seq_length_{}'.format(args.seq_length))
 
+###############################################################################
 
     for i in range(1, 5):  
         ##評価
@@ -134,11 +139,16 @@ def main():
             else:
                 train_split.append((movie_data[0], movie_data[1]))
         # TODO: movieをシャッフル
-  
-        with open("data/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+#####################################################################################################  
+        # with open("data/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+        #     pickle.dump(val_split, f)
+        # with open("data/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+        #     pickle.dump(train_split, f)
+        with open("data/no_ele/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
             pickle.dump(val_split, f)
-        with open("data/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+        with open("data/no_ele/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
             pickle.dump(train_split, f)
+######################################################################################################            
         print("finish {}".format(i))
 
     print(data[0])
