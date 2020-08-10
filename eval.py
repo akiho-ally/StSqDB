@@ -10,7 +10,7 @@ import collections
 import matplotlib.pyplot as plt
 
 import argparse
-
+ああああああああああ
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def eval(model, split, seq_length, bs, n_cpu, disp):
