@@ -52,7 +52,7 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
         logits = model(images) 
         probs = F.softmax(logits.data, dim=1)  ##確率
         labels = labels.view(int(bs)*int(seq_length))
-        _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze())
+        _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),use_no_element)
         if disp:
             print(i, c)
         correct.append(c)
@@ -117,8 +117,9 @@ if __name__ == '__main__':
 
     
     ####################################################################
+    print(confusion_matrix)
     fig, ax = plt.subplots(1,1,figsize=(8,6))
-    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=100, cmap=plt.get_cmap('Blues'))
+    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=20000, cmap=plt.get_cmap('Blues'))
     if args.use_no_element == False:
         plt.ylabel('Actual Category')
         plt.yticks(range(12), element_names)
