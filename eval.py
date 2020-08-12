@@ -23,7 +23,7 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
                                                     Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
                         train=False)
     else:
-        dataset = StsqDB(data_file='data/seq_length_{}/train_split_{}.pkl'.format(args.seq_length, args.split),
+        dataset = StsqDB(data_file='data/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
                     vid_dir='data/videos_40/',
                     seq_length=int(seq_length),
                     transform=transforms.Compose([ToTensor(),
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     ####################################################################
     print(confusion_matrix)
     fig, ax = plt.subplots(1,1,figsize=(8,6))
-    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=150000, cmap=plt.get_cmap('Blues'))
+    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=30000, cmap=plt.get_cmap('Blues'))
     if args.use_no_element == False:
         plt.ylabel('Actual Category')
         plt.yticks(range(12), element_names)
