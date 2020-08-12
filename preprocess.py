@@ -11,11 +11,16 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--seq_length', default=300)
     parser.add_argument('--img_size', default=224) 
+    parser.add_argument('--use_no_element', action='store_true')
     args = parser.parse_args() 
 
     # 1. movie_dicの読み込み
-    with open("annotationed_movie_12.pkl", "rb") as annotationed_movie:
-        movie_dic = pickle.load(annotationed_movie)
+    if args.use_no_element == False:
+        with open("annotationed_movie_12.pkl", "rb") as annotationed_movie:
+            movie_dic = pickle.load(annotationed_movie)
+    else:
+        with open("annotationed_movie.pkl", "rb") as annotationed_movie:
+            movie_dic = pickle.load(annotationed_movie) 
 
         # 1つのmovie_data = (images, labels)
         # data = [(images, labels), (images, labels), ..., (images, labels)]
@@ -119,10 +124,12 @@ def main():
 
 
  ###############################################################################   
-    # if not os.path.exists('data/seq_length_{}'.format(args.seq_length)):
-    #     os.mkdir('data/seq_length_{}'.format(args.seq_length))
-    if not os.path.exists('data/no_ele/seq_length_{}'.format(args.seq_length)):
-        os.mkdir('data/no_ele/seq_length_{}'.format(args.seq_length))
+    if augs.use_no_element == False:
+        if not os.path.exists('data/no_ele/seq_length_{}'.format(args.seq_length)):
+            os.mkdir('data/no_ele/seq_length_{}'.format(args.seq_length))
+    else:
+        if not os.path.exists('data/seq_length_{}'.format(args.seq_length)):
+            os.mkdir('data/seq_length_{}'.format(args.seq_length))
 
 ###############################################################################
 
@@ -140,14 +147,16 @@ def main():
                 train_split.append((movie_data[0], movie_data[1]))
         # TODO: movieをシャッフル
 #####################################################################################################  
-        # with open("data/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
-        #     pickle.dump(val_split, f)
-        # with open("data/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
-        #     pickle.dump(train_split, f)
-        with open("data/no_ele/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
-            pickle.dump(val_split, f)
-        with open("data/no_ele/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
-            pickle.dump(train_split, f)
+        if augs.use_no_element == False:
+            with open("data/no_ele/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+                pickle.dump(val_split, f)
+            with open("data/no_ele/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+                pickle.dump(train_split, f)
+        else:
+            with open("data/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+                pickle.dump(val_split, f)
+            with open("data/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+                pickle.dump(train_split, f)
 ######################################################################################################            
         print("finish {}".format(i))
 
