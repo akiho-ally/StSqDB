@@ -136,7 +136,7 @@ if __name__ == '__main__':
     data_loader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=6, drop_last=False) ##num_workers:６つ並行処理を行う 
 
     for i, sample in enumerate(data_loader):
-        images, labels = sample['images'], sample['labels']
+        images, labels = sample['images'], sample['labels']  ##images.size()=torch.Size([1, 300, 3, 224, 224])
         events = np.where(labels.squeeze() < 12)[0]  ##np.where:labels.squeeze()<8のインデックスを取得
         print('{} events: {}'.format(len(events), events)) ##8つのフレーム番号
     
