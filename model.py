@@ -49,20 +49,21 @@ class EventDetector(nn.Module):
             
 
     def forward(self, x, lengths=None):
-        batch_size, timesteps, C, H, W = x.size()
+        batch_size, timesteps, C, H, W = x.size()  ##torch.Size([8, 300, 3, 224, 224])
         self.hidden = self.init_hidden(batch_size)
 
         # CNN forward
-        c_in = x.view(batch_size * timesteps, C, H, W)
+        c_in = x.view(batch_size * timesteps, C, H, W)  ##torch.Size([2400, 3, 224, 224])
         c_out = self.cnn(c_in)
-        c_out = c_out.mean(3).mean(2)
+        c_out = c_out.mean(3).mean(2)  ##torch.Size([2400, 1280])  ##Global average pooling
         if self.dropout:
             c_out = self.drop(c_out)
 
         # LSTM forward
-        r_in = c_out.view(batch_size, timesteps, -1)
-        r_out, states = self.rnn(r_in, self.hidden)
-        out = self.lin(r_out)
+        r_in = c_out.view(batch_size, timesteps, -1)  ##torch.Size([8, 300, 1280])
+        r_out, states = self.rnn(r_in, self.hidden)  ##r_out:torch.Size([8, 300, 512]),  len(states)=2
+        out = self.lin(r_out)  ##torch.Size([8, 300, 12])
+        import pdb; pdb.set_trace()
         # out.shape => torch.Size([1, 300, 13])
         if self.use_no_element == False:
             out = out.view(batch_size*timesteps, 12)
