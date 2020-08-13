@@ -127,7 +127,7 @@ if __name__ == '__main__':
     norm = Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])  # ImageNet 平均 and 標準偏差 (RGB)で正規化
 
     dataset = StsqDB(data_file='data/seq_length_300/train_split_1.pkl',
-                     vid_dir='data/videos_40/',
+                     vid_dir='/home/akiho/projects/StSqDBdb/data/videos_40/',
                      seq_length=300,
                      transform=transforms.Compose([ToTensor(), norm]),
                      train=False)
