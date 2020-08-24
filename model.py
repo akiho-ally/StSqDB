@@ -63,7 +63,6 @@ class EventDetector(nn.Module):
         r_in = c_out.view(batch_size, timesteps, -1)  ##torch.Size([8, 300, 1280])
         r_out, states = self.rnn(r_in, self.hidden)  ##r_out:torch.Size([8, 300, 512]),  len(states)=2
         out = self.lin(r_out)  ##torch.Size([8, 300, 12])
-        import pdb; pdb.set_trace()
         # out.shape => torch.Size([1, 300, 13])
         if self.use_no_element == False:
             out = out.view(batch_size*timesteps, 12)

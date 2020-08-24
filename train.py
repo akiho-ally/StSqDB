@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--split', default=1)
     parser.add_argument('--iteration', default=8000)
-    parser.add_argument('--it_save', default=100)
+    parser.add_argument('--it_save', default=10)
     parser.add_argument('--batch_size', default=8)
     parser.add_argument('--seq_length', default=300) 
     parser.add_argument('--use_no_element', action='store_true') 
@@ -114,25 +114,34 @@ if __name__ == '__main__':
 
     epoch = 0
     for epoch in range(int(iterations)):
-    # while i < int(iterations):
+        print(epoch)
+
         for sample in tqdm(data_loader):
             images, labels = sample['images'].to(device), sample['labels'].to(device)
-            logits = model(images)       
-            labels = labels.view(int(bs)*int(seq_length))  ##??
+            logits = model(images.float())       
+            labels = labels.view(int(bs)*int(seq_length))  
             loss = criterion(logits, labels)
             optimizer.zero_grad()
             loss.backward() 
             losses.update(loss.item(), images.size(0))
             optimizer.step()
 
-            
-
+        
             print('epoch: {}\tLoss: {loss.val:.4f} ({loss.avg:.4f})'.format(epoch, loss=losses))
-            epoch += 1
-            if epoch % it_save == 0:
-                torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                            'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(epoch))
-            if epoch == iterations:
-                break
 
-        experiment.log_metrics("train_loss", losses, step=epoch)
+            if use_no_element == False:
+                epoch += 1
+                if epoch % it_save == 0:
+                    torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                                'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                if epoch == iterations:
+                    break
+            else:
+                epoch += 1
+                if epoch % it_save == 0:
+                    torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                                'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                if epoch == iterations:
+                    break
+
+        experiment.log_parameter("train_loss", loss.item(), step=epoch)
