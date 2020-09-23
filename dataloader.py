@@ -44,7 +44,7 @@ class StsqDB(Dataset):
         with open(self.data_file, "rb") as f:  ##このファイルはtrain_split1をload中のはず。。あれ、ここは全部のやつか？？
             data = pickle.load(f)
         images = [ pair[0] for pair in data ]  ##len(images)=300
-        labels = [ pair[1] for pair in data ] 
+        labels = [ pair[1] for pair in data ]
         return images, labels 
 
 

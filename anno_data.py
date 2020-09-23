@@ -4,26 +4,34 @@ import pickle
 from PIL import Image
 import numpy as np
 
-# element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
-element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle']
+element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
+# element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle']
 
-file_dict = {}
+train_file_dict = {}
+eval_file_dict = {}
 
 for element_name in element_names:
     # 'Bracket', 'Change_edge'
     #dir_path = '/Users/akiho/projects/d-hacks/skate/dataset/train/' + element_name
     dir_path = '/home/akiho/projects/StSqDB/data/dataset/train_all/' + element_name
     # '/Users/akiho/projects/d-hacks/skate/dataset/train/Bracket')
-    files = sorted(os.listdir(dir_path))
+    files_all = sorted(os.listdir(dir_path))
     # [file, file, file, ..., .DS_store]
-    for file in files:
-        if not file.startswith('.'):
-            file_dict[file] = element_name
+    train_files = files_all[1:151]
+    eval_files = files_all[151:181]
+    for train_file in train_files:
+        if not train_file.startswith('.'):
+            train_file_dict[train_file] = element_name
+    for eval_file in eval_files:
+        if not eval_file.startswith('.'):
+            eval_file_dict[eval_file] = element_name
 
 # #保存
 # pd.to_pickle(file_dict, "anno_data.pkl")
-with open("anno_data_12.pkl", "wb") as anno_data:
-    pickle.dump(file_dict, anno_data) 
+with open("anno_data_train.pkl", "wb") as anno_data_t:
+    pickle.dump(train_file_dict, anno_data_t) 
+with open("anno_data_eval.pkl", "wb") as anno_data_e:
+    pickle.dump(eval_file_dict, anno_data_e) 
 
 # #読み出し
 # hoge = pd.read_pickle("anno_data.pkl") 
@@ -33,34 +41,52 @@ with open("anno_data_12.pkl", "wb") as anno_data:
 
 
 
-## ここから下は別ファイルに切り取ってもいいかもしれない
-# TODO: filepathを見て、fire_dictの中身を動画ごとに分割
-movie_dic = {}
-# 
-# ↓
-# img_tensor: Tensor[(xxxx.pngのtensor, xxxx.pngのtensor, xxxx.pngのtensor]), label_tensor([1, 2, 3, 3, 5, ...])
-# この時点でエレメントはlabel_id化してしまっていいと思う
-movie_id = 0
-frame = ""
-for filepath, element_label in file_dict.items():
-    # filepath: "img22_576.jpg"とかになってるはず
-    mid = filepath.split("_")[0].replace("img", "")
-    frame_id = filepath.split("_")[1].strip()
-    if mid == "" :
-        mid = 1
-    else:
-         mid = int(mid)
-    label_id = element_names.index(element_label)
-    if mid in movie_dic.keys():
-        movie_dic[mid].append((filepath, label_id, frame_id))
-    else:
-        movie_dic[mid] = [(filepath, label_id, frame_id)]
+# ## ここから下は別ファイルに切り取ってもいいかもしれない
+# # TODO: filepathを見て、fire_dictの中身を動画ごとに分割
+# movie_dic = {}
+# # 
+# # ↓
+# # img_tensor: Tensor[(xxxx.pngのtensor, xxxx.pngのtensor, xxxx.pngのtensor]), label_tensor([1, 2, 3, 3, 5, ...])
+# # この時点でエレメントはlabel_id化してしまっていいと思う
+# movie_id = 0
+# frame = ""
+# for filepath, element_label in file_dict.items():
+#     # filepath: "img22_576.jpg"とかになってるはず
+#     mid = filepath.split("_")[0].replace("img", "")
+#     frame_id = filepath.split("_")[1].strip()
+#     if mid == "" :
+#         mid = 1
+#     else:
+#          mid = int(mid)
+#     label_id = element_names.index(element_label)
+#     if mid in movie_dic.keys():
+#         movie_dic[mid].append((filepath, label_id, frame_id))
+#     else:
+#         movie_dic[mid] = [(filepath, label_id, frame_id)]
 
-for mid, frames in movie_dic.items():
-    movie_dic[mid] = sorted(frames, key=lambda x:x[2])
+# for mid, frames in movie_dic.items():
+#     movie_dic[mid] = sorted(frames, key=lambda x:x[2])
 
-with open("annotationed_movie_12.pkl", "wb") as annotationed_movie:
-    pickle.dump(movie_dic, annotationed_movie) 
+# with open("annotationed_movie_500.pkl", "wb") as annotationed_movie:
+#     pickle.dump(movie_dic, annotationed_movie) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # pd.to_pickle(movie_dic, "annotationed_movie.pkl")
 # hoge2 = pd.read_pickle("annotationed_movie.pkl") 
 #print(hoge2)
