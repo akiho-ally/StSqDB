@@ -99,7 +99,8 @@ if __name__ == '__main__':
     if use_no_element == False:
         weights = torch.FloatTensor([1/3, 1, 2/5, 1/3, 1/6, 1, 1/4, 1, 1/4, 1/3, 1/2, 1/6]).to(device)
     else:
-        weights = torch.FloatTensor([1/3, 1, 2/5, 1/3, 1/6, 1, 1/4, 1, 1/4, 1/3, 1/2, 1/6, 1/60]).to(device)
+        # weights = torch.FloatTensor([1/3, 1, 2/5, 1/3, 1/6, 1, 1/4, 1, 1/4, 1/3, 1/2, 1/6, 1/60]).to(device)
+        weights = torch.FloatTensor([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]).to(device)
 
     criterion = torch.nn.CrossEntropyLoss(weight=weights)
     optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)  ##lambda:無名関数
@@ -118,7 +119,7 @@ if __name__ == '__main__':
 
         for sample in tqdm(data_loader):
             images, labels = sample['images'].to(device), sample['labels'].to(device)
-            logits = model(images.float())       
+            logits = model(images.float())    
             labels = labels.view(int(bs)*int(seq_length))  
             loss = criterion(logits, labels)
             optimizer.zero_grad()
@@ -131,16 +132,16 @@ if __name__ == '__main__':
 
             if use_no_element == False:
                 epoch += 1
-                if epoch % it_save == 0:
+                if epoch % int(it_save) == 0:
                     torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                                'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                                'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(epoch))
                 if epoch == iterations:
                     break
             else:
                 epoch += 1
-                if epoch % it_save == 0:
+                if epoch % int(it_save) == 0:
                     torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                                'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                                'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(epoch))
                 if epoch == iterations:
                     break
 

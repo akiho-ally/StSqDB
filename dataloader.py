@@ -44,7 +44,7 @@ class StsqDB(Dataset):
         with open(self.data_file, "rb") as f:  ##このファイルはtrain_split1をload中のはず。。あれ、ここは全部のやつか？？
             data = pickle.load(f)
         images = [ pair[0] for pair in data ]  ##len(images)=300
-        labels = [ pair[1] for pair in data ]
+        labels = [ pair[1] for pair in data ] 
         return images, labels 
 
 
@@ -126,9 +126,9 @@ if __name__ == '__main__':
 
     norm = Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])  # ImageNet 平均 and 標準偏差 (RGB)で正規化
 
-    dataset = StsqDB(data_file='data/seq_length_300/train_split_1.pkl',
-                     vid_dir='/home/akiho/projects/StSqDBdb/data/videos_40/',
-                     seq_length=300,
+    dataset = StsqDB(data_file='data/same_frames/train_split_1.pkl',
+                     vid_dir='data/videos_40/',
+                     seq_length=150,
                      transform=transforms.Compose([ToTensor(), norm]),
                      train=False)
    
@@ -136,7 +136,8 @@ if __name__ == '__main__':
     data_loader = DataLoader(dataset, batch_size=1, shuffle=False, num_workers=6, drop_last=False) ##num_workers:６つ並行処理を行う 
 
     for i, sample in enumerate(data_loader):
-        images, labels = sample['images'], sample['labels']  ##images.size()=torch.Size([1, 300, 3, 224, 224])
+        images, labels = sample['images'], sample['labels']
+        import pdb; pdb.set_trace()
         events = np.where(labels.squeeze() < 12)[0]  ##np.where:labels.squeeze()<8のインデックスを取得
         print('{} events: {}'.format(len(events), events)) ##8つのフレーム番号
     

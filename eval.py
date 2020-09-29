@@ -23,7 +23,7 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
                                                     Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
                         train=False)
     else:
-        dataset = StsqDB(data_file='data/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
+        dataset = StsqDB(data_file='data/same_frames/val_split_1.pkl',
                     vid_dir='data/videos_40/',
                     seq_length=int(seq_length),
                     transform=transforms.Compose([ToTensor(),
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     ####################################################################
     print(confusion_matrix)
     fig, ax = plt.subplots(1,1,figsize=(8,6))
-    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=30000, cmap=plt.get_cmap('Blues'))
+    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=90, cmap=plt.get_cmap('Blues'))
     if args.use_no_element == False:
         plt.ylabel('Actual Category')
         plt.yticks(range(12), element_names)
@@ -136,4 +136,4 @@ if __name__ == '__main__':
         plt.xticks(range(13), element_names)      
 
         save_dir = '/home/akiho/projects/StSqDB/'
-        plt.savefig(save_dir + 'figure_13.png')
+        plt.savefig(save_dir + 'f_same_frames_30_2.png')

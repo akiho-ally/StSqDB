@@ -51,7 +51,6 @@ class EventDetector(nn.Module):
     def forward(self, x, lengths=None):
         batch_size, timesteps, C, H, W = x.size()  ##torch.Size([8, 300, 3, 224, 224])
         self.hidden = self.init_hidden(batch_size)
-        import pdb; pdb.set_trace()
 
         # CNN forward
         c_in = x.view(batch_size * timesteps, C, H, W)  ##torch.Size([2400, 3, 224, 224])
