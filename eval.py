@@ -17,14 +17,14 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
     
     if use_no_element == False:
         dataset = StsqDB(data_file='data/no_ele/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
-                        vid_dir='data/videos_40/',
+                        vid_dir='data/videos_56/',
                         seq_length=int(seq_length),
                         transform=transforms.Compose([ToTensor(),
                                                     Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
                         train=False)
     else:
         dataset = StsqDB(data_file='data/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
-                    vid_dir='data/videos_40/',
+                    vid_dir='data/videos_56/',
                     seq_length=int(seq_length),
                     transform=transforms.Compose([ToTensor(),
                                                 Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),

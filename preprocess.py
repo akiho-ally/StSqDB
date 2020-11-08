@@ -36,7 +36,7 @@ def main():
         for frame in frames:
             filename = frame[0]
             label_id = frame[1]
-            filepath = "data/videos_40/img" +str( mid )+ '/' + filename
+            filepath = "data/videos_56/img" +str( mid )+ '/' + filename
             img = Image.open(filepath)
             img_resize = np.array(img.resize((args.img_size, args.img_size)))
             images.append(img_resize)
@@ -61,7 +61,7 @@ def main():
         for frame in frames:  
             filename = frame[0]
             label_id = frame[1]
-            filepath = "data/videos_40/img" +str( mid )+ '/' + filename
+            filepath = "data/videos_56/img" +str( mid )+ '/' + filename
             img = Image.open(filepath)
             img_resize = np.array(img.resize((args.img_size, args.img_size)))
             img_fliped = np.array(cv2.flip(img_resize, 1)) 
@@ -90,7 +90,7 @@ def main():
         for frame in frames:  
             filename = frame[0]
             label_id = frame[1]
-            filepath = "data/videos_40/img" +str( mid )+ '/' + filename
+            filepath = "data/videos_56/img" +str( mid )+ '/' + filename
             img = Image.open(filepath)
             img_resize = np.array(img.resize((args.img_size, args.img_size)))
             img_hsv = cv2.cvtColor(img_resize,cv2.COLOR_BGR2HSV)
@@ -124,7 +124,7 @@ def main():
 
 
  ###############################################################################   
-    if augs.use_no_element == False:
+    if args.use_no_element == False:
         if not os.path.exists('data/no_ele/seq_length_{}'.format(args.seq_length)):
             os.mkdir('data/no_ele/seq_length_{}'.format(args.seq_length))
     else:
@@ -147,7 +147,7 @@ def main():
                 train_split.append((movie_data[0], movie_data[1]))
         # TODO: movieをシャッフル
 #####################################################################################################  
-        if augs.use_no_element == False:
+        if args.use_no_element == False:
             with open("data/no_ele/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
                 pickle.dump(val_split, f)
             with open("data/no_ele/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:

@@ -22,15 +22,15 @@ if __name__ == '__main__':
     args = parser.parse_args() 
     # これ以降、このファイル内では "args.iterration" で2000とか呼び出せるようになる
 
-    experiment = Experiment(api_key='d7Xjw6KSK6KL7pUOhXJvONq9j', project_name='stsqdb')
-    hyper_params = {
-    'batch_size': args.batch_size,
-    'iterations' : args.iteration,
-    'seq_length' : args.seq_length,
-    'use_no_element' : args.use_no_element,
-    }
+    # experiment = Experiment(api_key='d7Xjw6KSK6KL7pUOhXJvONq9j', project_name='stsqdb')
+    # hyper_params = {
+    # 'batch_size': args.batch_size,
+    # 'iterations' : args.iteration,
+    # 'seq_length' : args.seq_length,
+    # 'use_no_element' : args.use_no_element,
+    # }
 
-    experiment.log_parameters(hyper_params)
+    # experiment.log_parameters(hyper_params)
 
     # training configuration
     split = args.split
@@ -68,14 +68,14 @@ if __name__ == '__main__':
     # TODO: vid_dirのpathをかえる。stsqの動画を切り出したimage全部が含まれているdirにする
     if use_no_element == False:
         dataset = StsqDB(data_file='data/no_ele/seq_length_{}/train_split_{}.pkl'.format(args.seq_length, args.split),
-                        vid_dir='data/videos_40/',
+                        vid_dir='data/videos_56/',
                         seq_length=int(seq_length),
                         transform=transforms.Compose([ToTensor(),
                                                     Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
                         train=True)
     else:
         dataset = StsqDB(data_file='data/seq_length_{}/train_split_{}.pkl'.format(args.seq_length, args.split),
-                    vid_dir='data/videos_40/',
+                    vid_dir='data/videos_56/',
                     seq_length=int(seq_length),
                     transform=transforms.Compose([ToTensor(),
                                                 Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),

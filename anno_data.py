@@ -4,8 +4,8 @@ import pickle
 from PIL import Image
 import numpy as np
 
-# element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
-element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle']
+element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
+# element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle']
 
 file_dict = {}
 
@@ -22,11 +22,12 @@ for element_name in element_names:
 
 # #保存
 # pd.to_pickle(file_dict, "anno_data.pkl")
-with open("anno_data_12.pkl", "wb") as anno_data:
+with open("anno_data.pkl", "wb") as anno_data:
     pickle.dump(file_dict, anno_data) 
 
 # #読み出し
 # hoge = pd.read_pickle("anno_data.pkl") 
+
 
 
 
@@ -59,7 +60,7 @@ for filepath, element_label in file_dict.items():
 for mid, frames in movie_dic.items():
     movie_dic[mid] = sorted(frames, key=lambda x:x[2])
 
-with open("annotationed_movie_12.pkl", "wb") as annotationed_movie:
+with open("annotationed_movie.pkl", "wb") as annotationed_movie:
     pickle.dump(movie_dic, annotationed_movie) 
 # pd.to_pickle(movie_dic, "annotationed_movie.pkl")
 # hoge2 = pd.read_pickle("annotationed_movie.pkl") 
