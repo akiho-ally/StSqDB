@@ -12,14 +12,6 @@
   * 交差検証のために4つにsplit(pklファイルの作成)
 
 
-## Train
-iteration,bs,seq_lengthを変えて実験中
-
-
-
-## Evaluate
-エレメントごとに精度を出したい
-
 
 ## これまでの精度  
 Average PCE: 0.34063427299703264  
