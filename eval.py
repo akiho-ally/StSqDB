@@ -14,7 +14,7 @@ import argparse
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def eval(model, split, seq_length, bs, n_cpu, disp):
-    
+
     if use_no_element == False:
         dataset = StsqDB(data_file='data/no_ele/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
                         vid_dir='data/videos_56/',
@@ -49,7 +49,7 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
 
     for i, sample in enumerate(data_loader):
         images, labels = sample['images'].to(device), sample['labels'].to(device)
-        logits = model(images) 
+        logits = model(images)
         probs = F.softmax(logits.data, dim=1)  ##確率
         labels = labels.view(int(bs)*int(seq_length))
         _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),use_no_element)
@@ -75,10 +75,10 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--split', default=1)
     parser.add_argument('--batch_size', default=4)
-    parser.add_argument('--seq_length', default=300) 
+    parser.add_argument('--seq_length', default=300)
     parser.add_argument('--model_num', default=900)
-    parser.add_argument('--use_no_element', action='store_true') 
-    args = parser.parse_args() 
+    parser.add_argument('--use_no_element', action='store_true')
+    args = parser.parse_args()
 
 
     split = args.split
@@ -97,7 +97,10 @@ if __name__ == '__main__':
                           dropout=False,
                           use_no_element=use_no_element)
 
-    save_dict = torch.load('models/swingnet_{}.pth.tar'.format(args.model_num))
+    if use_no_element == False:
+        save_dict = torch.load('models/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
+    else:
+        save_dict = torch.load('models/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
     model.load_state_dict(save_dict['model_state_dict'])
     model.to(device)
     model.eval()
@@ -115,7 +118,7 @@ if __name__ == '__main__':
         element_name = element_names[j]
         print('{}: {}  ({} / {})'.format(element_name, element_PCE[j], all_element_correct[j], all_element_sum[j]))
 
-    
+
     ####################################################################
     print(confusion_matrix)
     fig, ax = plt.subplots(1,1,figsize=(8,6))
@@ -127,13 +130,13 @@ if __name__ == '__main__':
         plt.xticks(range(12), element_names)
 
         save_dir = '/home/akiho/projects/StSqDB/'
-        plt.savefig(save_dir + 'figure_12.png')
+        plt.savefig(save_dir + 'vgg_figure_12.png')
 
     else:
         plt.ylabel('Actual Category')
         plt.yticks(range(13), element_names)
         plt.xlabel('Predicted Category')
-        plt.xticks(range(13), element_names)      
+        plt.xticks(range(13), element_names)
 
         save_dir = '/home/akiho/projects/StSqDB/'
-        plt.savefig(save_dir + 'figure_13.png')
+        plt.savefig(save_dir + 'vgg_figure_13.png')

@@ -2,11 +2,7 @@ import torch
 import torch.nn as nn
 from torch.autograd import Variable
 from MobileNetV2 import MobileNetV2
-from resnet import Block
-from resnet import ResNet50
-from resnet import GlobalAvgPool2d
-
-
+import torchvision.models as models
 
 class EventDetector(nn.Module):
     def __init__(self, pretrain, width_mult, lstm_layers, lstm_hidden, device, use_no_element, bidirectional=True, dropout=True):
@@ -30,13 +26,20 @@ class EventDetector(nn.Module):
 
 
         #resnet版
-        net = ResNet50(13)
-        ##ここが怪しい気がするけど、どうすれば良いかがよくわからない。。
-        self.cnn = nn.Sequential(*list(net.children())[:15])
+        # self.cnn = torch.hub.load('pytorch/vision:v0.6.0', 'resnet18', pretrained=True)
+
+        # #alexnet版
+        # alexnet = models.alexnet(pretrained=True)
+        # self.cnn = alexnet
+
+        #VGG
+        vgg16 = models.vgg16(pretrained=True)
+        self.cnn = vgg16
 
 
 
-        self.rnn = nn.LSTM(int(1280*width_mult if width_mult > 1.0 else 1280),
+
+        self.rnn = nn.LSTM(int(1000*width_mult if width_mult > 1.0 else 1000),
                            self.lstm_hidden, self.lstm_layers,
                            batch_first=True, bidirectional=bidirectional)
         if self.use_no_element == False:
@@ -60,17 +63,19 @@ class EventDetector(nn.Module):
         else:
             return torch.zeros(self.lstm_layers, batch_size, self.lstm_hidden).to(self.device),torch.zeros(self.lstm_layers, batch_size, self.lstm_hidden).to(self.device)
 
-            
+
 
     # def forward(self, x, lengths=None):
-    def forward(self, x, lengths=None):
+    def forward(self,x):
         batch_size, timesteps, C, H, W = x.size()  ##torch.Size([8, 300, 3, 224, 224])
         self.hidden = self.init_hidden(batch_size)
 
         # CNN forward
         c_in = x.view(batch_size * timesteps, C, H, W)  ##torch.Size([2400, 3, 224, 224])
         c_out = self.cnn(c_in)
-        c_out = c_out.mean(3).mean(2)  ##torch.Size([2400, 1280])  ##Global average pooling
+
+        # c_out = c_out.mean(3).mean(2)  ##torch.Size([2400, 1280])  ##Global average pooling
+
         if self.dropout:
             c_out = self.drop(c_out)
 

@@ -1,4 +1,4 @@
-
+import torch.nn as nn
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -29,7 +29,7 @@ class Block(nn.Module):
         self.shortcut = self._shortcut(channel_in, channel_out)
         
         self.relu3 = nn.ReLU()
-    def forward(self, x):
+    def forward(self,x):
         h = self.conv1(x)
         h = self.bn1(h)
         h = self.relu1(h)
@@ -94,7 +94,7 @@ class ResNet50(nn.Module):
         self.avg_pool = GlobalAvgPool2d()  # TODO: GlobalAvgPool2d
         self.fc = nn.Linear(2048, 1000)
         self.out = nn.Linear(1000, output_dim)
-    def forward(self, x):
+    def forward(self,x):
         h = self.conv1(x)
         h = self.bn1(h)
         h = self.relu1(h)
@@ -130,5 +130,5 @@ class GlobalAvgPool2d(nn.Module):
     def __init__(self,
                  device='cpu'):
         super().__init__()
-    def forward(self, x):
+    def forward(self,x):
         return F.avg_pool2d(x, kernel_size=x.size()[2:]).view(-1, x.size(1))

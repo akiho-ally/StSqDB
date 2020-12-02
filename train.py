@@ -15,22 +15,22 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--split', default=1)
     parser.add_argument('--iteration', default=8000)
-    parser.add_argument('--it_save', default=10)
+    parser.add_argument('--it_save', default=100)
     parser.add_argument('--batch_size', default=8)
-    parser.add_argument('--seq_length', default=300) 
-    parser.add_argument('--use_no_element', action='store_true') 
-    args = parser.parse_args() 
+    parser.add_argument('--seq_length', default=300)
+    parser.add_argument('--use_no_element', action='store_true')
+    args = parser.parse_args()
     # これ以降、このファイル内では "args.iterration" で2000とか呼び出せるようになる
 
-    # experiment = Experiment(api_key='d7Xjw6KSK6KL7pUOhXJvONq9j', project_name='stsqdb')
-    # hyper_params = {
-    # 'batch_size': args.batch_size,
-    # 'iterations' : args.iteration,
-    # 'seq_length' : args.seq_length,
-    # 'use_no_element' : args.use_no_element,
-    # }
+    experiment = Experiment(api_key='d7Xjw6KSK6KL7pUOhXJvONq9j', project_name='stsqdb')
+    hyper_params = {
+    'batch_size': args.batch_size,
+    'iterations' : args.iteration,
+    'seq_length' : args.seq_length,
+    'use_no_element' : args.use_no_element,
+    }
 
-    # experiment.log_parameters(hyper_params)
+    experiment.log_parameters(hyper_params)
 
     # training configuration
     split = args.split
@@ -91,7 +91,7 @@ if __name__ == '__main__':
                              drop_last=True)
 
     # dataset.__len__() : 47 (dataset/bs)
-                  
+
 
     # the 8 golf swing events are classes 0 through 7, no-event is class 8
     # the ratio of events to no-events is approximately 1:35 so weight classes accordingly:
@@ -107,8 +107,9 @@ if __name__ == '__main__':
     losses = AverageMeter()
     #print('utils.py, class AverageMeter()')
 
-    if not os.path.exists('models'):
-        os.mkdir('models')
+    if not os.path.exists('models/seq_length_{}'.format(args.seq_length)):
+        os.mkdir('models/seq_length_{}'.format(args.seq_length))
+
 
 
 
@@ -118,29 +119,29 @@ if __name__ == '__main__':
 
         for sample in tqdm(data_loader):
             images, labels = sample['images'].to(device), sample['labels'].to(device)
-            logits = model(images.float())       
-            labels = labels.view(int(bs)*int(seq_length))  
+            logits = model(images.float())
+            labels = labels.view(int(bs)*int(seq_length))
             loss = criterion(logits, labels)
             optimizer.zero_grad()
-            loss.backward() 
+            loss.backward()
             losses.update(loss.item(), images.size(0))
             optimizer.step()
 
-        
-            print('epoch: {}\tLoss: {loss.val:.4f} ({loss.avg:.4f})'.format(epoch, loss=losses))
+
+            print('Loss: {loss.val:.4f} ({loss.avg:.4f})'.format(loss=losses))
 
             if use_no_element == False:
                 epoch += 1
                 if epoch % it_save == 0:
                     torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                                'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                                'model_state_dict': model.state_dict()}, 'models/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
                 if epoch == iterations:
                     break
             else:
                 epoch += 1
                 if epoch % it_save == 0:
                     torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                                'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                                'model_state_dict': model.state_dict()}, 'models/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
                 if epoch == iterations:
                     break
 
