@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--split', default=1)
     parser.add_argument('--iteration', default=8000)
-    parser.add_argument('--it_save', default=100)
+    parser.add_argument('--it_save', default=1)
     parser.add_argument('--batch_size', default=8)
     parser.add_argument('--seq_length', default=300)
     parser.add_argument('--use_no_element', action='store_true')
@@ -107,8 +107,8 @@ if __name__ == '__main__':
     losses = AverageMeter()
     #print('utils.py, class AverageMeter()')
 
-    if not os.path.exists('models/seq_length_{}'.format(args.seq_length)):
-        os.mkdir('models/seq_length_{}'.format(args.seq_length))
+    if not os.path.exists('models/vgg/seq_length_{}'.format(args.seq_length)):
+        os.mkdir('models/vgg/seq_length_{}'.format(args.seq_length))
 
 
 
@@ -130,19 +130,19 @@ if __name__ == '__main__':
 
             print('Loss: {loss.val:.4f} ({loss.avg:.4f})'.format(loss=losses))
 
-            if use_no_element == False:
-                epoch += 1
-                if epoch % it_save == 0:
-                    torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                                'model_state_dict': model.state_dict()}, 'models/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
-                if epoch == iterations:
-                    break
-            else:
-                epoch += 1
-                if epoch % it_save == 0:
-                    torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                                'model_state_dict': model.state_dict()}, 'models/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
-                if epoch == iterations:
-                    break
+        if use_no_element == False:
+            epoch += 1
+            if epoch % it_save == 0:
+                torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                            'model_state_dict': model.state_dict()}, 'models/vgg/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+            if epoch == iterations:
+                break
+        else:
+            epoch += 1
+            if epoch % it_save == 0:
+                torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                            'model_state_dict': model.state_dict()}, 'models/vgg/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+            if epoch == iterations:
+                break
 
         experiment.log_parameter("train_loss", loss.item(), step=epoch)

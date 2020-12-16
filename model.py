@@ -32,11 +32,13 @@ class EventDetector(nn.Module):
         # alexnet = models.alexnet(pretrained=True)
         # self.cnn = alexnet
 
-        #VGG
+        # #VGG
         vgg16 = models.vgg16(pretrained=True)
         self.cnn = vgg16
 
-
+        # #densenet
+        # densenet = models.densenet161(pretrained=True)
+        # self.cnn = densenet
 
 
         self.rnn = nn.LSTM(int(1000*width_mult if width_mult > 1.0 else 1000),
@@ -74,8 +76,9 @@ class EventDetector(nn.Module):
         c_in = x.view(batch_size * timesteps, C, H, W)  ##torch.Size([2400, 3, 224, 224])
         c_out = self.cnn(c_in)
 
+        # ##########
         # c_out = c_out.mean(3).mean(2)  ##torch.Size([2400, 1280])  ##Global average pooling
-
+        ##########
         if self.dropout:
             c_out = self.drop(c_out)
 
