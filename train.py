@@ -18,7 +18,9 @@ if __name__ == '__main__':
     parser.add_argument('--it_save', default=1)
     parser.add_argument('--batch_size', default=8)
     parser.add_argument('--seq_length', default=300)
-    parser.add_argument('--use_no_element', action='store_true')
+    # parser.add_argument('--use_no_element', action='store_true')
+    parser.add_argument('--turn', action='store_true')
+    parser.add_argument('--step', action='store_true')
     args = parser.parse_args()
     # これ以降、このファイル内では "args.iterration" で2000とか呼び出せるようになる
 
@@ -27,7 +29,9 @@ if __name__ == '__main__':
     'batch_size': args.batch_size,
     'iterations' : args.iteration,
     'seq_length' : args.seq_length,
-    'use_no_element' : args.use_no_element,
+    # 'use_no_element' : args.use_no_element,
+    'turn' : args.turn,
+    'step' : args.step
     }
 
     experiment.log_parameters(hyper_params)
@@ -36,12 +40,14 @@ if __name__ == '__main__':
     split = args.split
     iterations = args.iteration
     it_save = args.it_save # save model every 100 iterations
-    n_cpu = 6
+    n_cpu = 0
     seq_length = args.seq_length
     bs = args.batch_size  # batch size
     k = 10  # frozen layers
 
-    use_no_element = args.use_no_element
+    # use_no_element = args.use_no_element
+    turn = args.turn
+    step = args.step
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -54,7 +60,9 @@ if __name__ == '__main__':
                           device=device,
                           bidirectional=True,
                           dropout=False,
-                          use_no_element=use_no_element
+                        #   use_no_element=use_no_element
+                        turn = turn,
+                        step = step
                           )
     #print('model.py, class EventDetector()')
 
@@ -64,22 +72,36 @@ if __name__ == '__main__':
     model.to(device)
     print('Loading Data')
 
-
-    # TODO: vid_dirのpathをかえる。stsqの動画を切り出したimage全部が含まれているdirにする
-    if use_no_element == False:
-        dataset = StsqDB(data_file='data/no_ele/seq_length_{}/train_split_{}.pkl'.format(args.seq_length, args.split),
+################################################
+    if turn == True:
+        dataset = StsqDB(data_file='data/turn/seq_length_{}/train_split_{}.pkl'.format(args.seq_length, args.split),
                         vid_dir='data/videos_56/',
                         seq_length=int(seq_length),
                         transform=transforms.Compose([ToTensor(),
                                                     Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
                         train=True)
-    else:
-        dataset = StsqDB(data_file='data/seq_length_{}/train_split_{}.pkl'.format(args.seq_length, args.split),
-                    vid_dir='data/videos_56/',
-                    seq_length=int(seq_length),
-                    transform=transforms.Compose([ToTensor(),
-                                                Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
-                    train=True)
+    elif step == True:
+        dataset = StsqDB(data_file='data/step/seq_length_{}/train_split_{}.pkl'.format(args.seq_length, args.split),
+                        vid_dir='data/videos_56/',
+                        seq_length=int(seq_length),
+                        transform=transforms.Compose([ToTensor(),
+                                                    Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+                        train=True)
+    # if use_no_element == False:
+    #     dataset = StsqDB(data_file='data/no_ele/seq_length_{}/train_split_{}.pkl'.format(args.seq_length, args.split),
+    #                     vid_dir='data/videos_56/',
+    #                     seq_length=int(seq_length),
+    #                     transform=transforms.Compose([ToTensor(),
+    #                                                 Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+    #                     train=True)
+    # else:
+    #     dataset = StsqDB(data_file='data/seq_length_{}/train_split_{}.pkl'.format(args.seq_length, args.split),
+    #                 vid_dir='data/videos_56/',
+    #                 seq_length=int(seq_length),
+    #                 transform=transforms.Compose([ToTensor(),
+    #                                             Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+    #                 train=True)
+###########################################
     print('dataloader.py, class StsqDB()')
     # dataset.__len__() : 1050
 
@@ -96,10 +118,16 @@ if __name__ == '__main__':
     # the 8 golf swing events are classes 0 through 7, no-event is class 8
     # the ratio of events to no-events is approximately 1:35 so weight classes accordingly:
     # TODO: edit weights shape from golf-8-element to stsq-12-element
-    if use_no_element == False:
-        weights = torch.FloatTensor([1/3, 1, 2/5, 1/3, 1/6, 1, 1/4, 1, 1/4, 1/3, 1/2, 1/6]).to(device)
-    else:
-        weights = torch.FloatTensor([1/3, 1, 2/5, 1/3, 1/6, 1, 1/4, 1, 1/4, 1/3, 1/2, 1/6, 1/60]).to(device)
+    #################################################
+    if turn == True:
+        weights = torch.FloatTensor([1/3, 1/6, 1/4, 1/4, 1/3,  1/6]).to(device)
+    elif step == True:
+        weights = torch.FloatTensor([1, 2/5, 1/3, 1,  1, 1/2]).to(device)
+    # if use_no_element == False:
+    #     weights = torch.FloatTensor([1/3, 1, 2/5, 1/3, 1/6, 1, 1/4, 1, 1/4, 1/3, 1/2, 1/6]).to(device)
+    # else:
+    #     weights = torch.FloatTensor([1/3, 1, 2/5, 1/3, 1/6, 1, 1/4, 1, 1/4, 1/3, 1/2, 1/6, 1/60]).to(device)
+
 
     criterion = torch.nn.CrossEntropyLoss(weight=weights)
     optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)  ##lambda:無名関数
@@ -107,8 +135,8 @@ if __name__ == '__main__':
     losses = AverageMeter()
     #print('utils.py, class AverageMeter()')
 
-    if not os.path.exists('models/vgg/seq_length_{}'.format(args.seq_length)):
-        os.mkdir('models/vgg/seq_length_{}'.format(args.seq_length))
+    if not os.path.exists('models/turn/seq_length_{}'.format(args.seq_length)):
+        os.mkdir('models/turn/seq_length_{}'.format(args.seq_length))
 
 
 
@@ -130,19 +158,34 @@ if __name__ == '__main__':
 
             print('Loss: {loss.val:.4f} ({loss.avg:.4f})'.format(loss=losses))
 
-        if use_no_element == False:
+
+        if turn == True:
             epoch += 1
             if epoch % it_save == 0:
                 torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                            'model_state_dict': model.state_dict()}, 'models/vgg/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                            'model_state_dict': model.state_dict()}, 'models/turn/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
             if epoch == iterations:
                 break
-        else:
+        elif step == True :
             epoch += 1
             if epoch % it_save == 0:
                 torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                            'model_state_dict': model.state_dict()}, 'models/vgg/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                            'model_state_dict': model.state_dict()}, 'models/step/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
             if epoch == iterations:
                 break
+        # if use_no_element == False:
+        #     epoch += 1
+        #     if epoch % it_save == 0:
+        #         torch.save({'optimizer_state_dict': optimizer.state_dict(),
+        #                     'model_state_dict': model.state_dict()}, 'models/vgg/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+        #     if epoch == iterations:
+        #         break
+        # else:
+        #     epoch += 1
+        #     if epoch % it_save == 0:
+        #         torch.save({'optimizer_state_dict': optimizer.state_dict(),
+        #                     'model_state_dict': model.state_dict()}, 'models/vgg/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+        #     if epoch == iterations:
+        #         break
 
         experiment.log_parameter("train_loss", loss.item(), step=epoch)

@@ -10,17 +10,31 @@ import os
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--seq_length', default=300)
-    parser.add_argument('--img_size', default=224) 
-    parser.add_argument('--use_no_element', action='store_true')
-    args = parser.parse_args() 
+    parser.add_argument('--img_size', default=224)
+    # parser.add_argument('--use_no_element', action='store_true')
+    parser.add_argument('--turn', action='store_true')
+    parser.add_argument('--step', action='store_true')
+    args = parser.parse_args()
+
 
     # 1. movie_dicの読み込み
-    if args.use_no_element == False:
-        with open("annotationed_movie_12.pkl", "rb") as annotationed_movie:
+    if args.turn == True :
+        with open("annotationed_movie_turn.pkl", "rb") as annotationed_movie:
             movie_dic = pickle.load(annotationed_movie)
+        print('turn file')
+    elif args.step == True :
+        with open("annotationed_movie_step.pkl", "rb") as annotationed_movie:
+            movie_dic = pickle.load(annotationed_movie)
+        print('step file')
     else:
-        with open("annotationed_movie.pkl", "rb") as annotationed_movie:
-            movie_dic = pickle.load(annotationed_movie) 
+        print('No!!')
+
+    # if args.use_no_element == False:
+    #     with open("annotationed_movie_12.pkl", "rb") as annotationed_movie:
+    #         movie_dic = pickle.load(annotationed_movie)
+    # else:
+    #     with open("annotationed_movie.pkl", "rb") as annotationed_movie:
+    #         movie_dic = pickle.load(annotationed_movie)
 
         # 1つのmovie_data = (images, labels)
         # data = [(images, labels), (images, labels), ..., (images, labels)]
@@ -41,7 +55,7 @@ def main():
             img_resize = np.array(img.resize((args.img_size, args.img_size)))
             images.append(img_resize)
             labels.append(label_id)
-            
+
             #len(images):1467
 
         index = 0
@@ -54,22 +68,22 @@ def main():
             data.append((split_image, split_label, split_id))  ##split_id = 3
             index += 10
         # data.append((images, labels, split_id))
-        
+        print(len(data))
         ################反転処理
         fliped_images = []
         fliped_labels = []
-        for frame in frames:  
+        for frame in frames:
             filename = frame[0]
             label_id = frame[1]
             filepath = "data/videos_56/img" +str( mid )+ '/' + filename
             img = Image.open(filepath)
             img_resize = np.array(img.resize((args.img_size, args.img_size)))
-            img_fliped = np.array(cv2.flip(img_resize, 1)) 
+            img_fliped = np.array(cv2.flip(img_resize, 1))
             fliped_images.append(img_fliped)
             fliped_labels.append(label_id)
 
 
-        
+
         index = 0
 
         for i in range(len(fliped_images)):
@@ -78,7 +92,7 @@ def main():
                 split_fliped_label = fliped_labels[index : index+int(args.seq_length)]
             else:
                 break
-            data.append((split_fliped_image, split_fliped_label, split_id))  
+            data.append((split_fliped_image, split_fliped_label, split_id))
             index += 10
 
         # import pdb; pdb.set_trace() ##len(data) = 234
@@ -87,7 +101,7 @@ def main():
         ##############色補正
         bgr_images = []
         bgr_labels = []
-        for frame in frames:  
+        for frame in frames:
             filename = frame[0]
             label_id = frame[1]
             filepath = "data/videos_56/img" +str( mid )+ '/' + filename
@@ -117,23 +131,23 @@ def main():
 
 
         # TODO: 系列長について、padding or 長い動画の分割
-            # data.append((split_images, split_labels, split_id))  
+            # data.append((split_images, split_labels, split_id))
         print('movie {}  len(data) = {} '.format(mid, len(data)) )
 
     # import pdb; pdb.set_trace() ##len(data)=10197
 
 
- ###############################################################################   
-    if args.use_no_element == False:
-        if not os.path.exists('data/no_ele/seq_length_{}'.format(args.seq_length)):
-            os.mkdir('data/no_ele/seq_length_{}'.format(args.seq_length))
-    else:
-        if not os.path.exists('data/seq_length_{}'.format(args.seq_length)):
-            os.mkdir('data/seq_length_{}'.format(args.seq_length))
+ ###############################################################################
+    # if args.use_no_element == False:
+    #     if not os.path.exists('data/no_ele/seq_length_{}'.format(args.seq_length)):
+    #         os.mkdir('data/no_ele/seq_length_{}'.format(args.seq_length))
+    # else:
+    #     if not os.path.exists('data/seq_length_{}'.format(args.seq_length)):
+    #         os.mkdir('data/seq_length_{}'.format(args.seq_length))
 
 ###############################################################################
 
-    for i in range(1, 5):  
+    for i in range(1, 5):
         ##評価
         images = []
         labels = []
@@ -146,22 +160,34 @@ def main():
             else:
                 train_split.append((movie_data[0], movie_data[1]))
         # TODO: movieをシャッフル
-#####################################################################################################  
-        if args.use_no_element == False:
-            with open("data/no_ele/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+#####################################################################################################
+
+        if args.turn == True:
+            with open("data/turn/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
                 pickle.dump(val_split, f)
-            with open("data/no_ele/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+            with open("data/turn/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
                 pickle.dump(train_split, f)
-        else:
-            with open("data/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+        elif args.step == True:
+            with open("data/step/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
                 pickle.dump(val_split, f)
-            with open("data/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+            with open("data/step/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
                 pickle.dump(train_split, f)
-######################################################################################################            
+
+        # if args.use_no_element == False:
+        #     with open("data/no_ele/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+        #         pickle.dump(val_split, f)
+        #     with open("data/no_ele/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+        #         pickle.dump(train_split, f)
+        # else:
+        #     with open("data/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+        #         pickle.dump(val_split, f)
+        #     with open("data/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+        #         pickle.dump(train_split, f)
+######################################################################################################
         print("finish {}".format(i))
 
     print(data[0])
-    
+
     # TODO: dataset 情報を表示
 
 

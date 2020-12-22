@@ -5,7 +5,10 @@ from PIL import Image
 import numpy as np
 
 # element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
-element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle']
+##turn
+# element_names = ['Bracket', 'Counter_turn', 'Loop', 'Rocker_turn', 'Three_turn', 'Twizzle']
+##step
+element_names = ['Change_edge', 'Chasse', 'Choctaw', 'Cross_roll', 'Mohawk', 'Toe_step']
 
 file_dict = {}
 
@@ -22,11 +25,11 @@ for element_name in element_names:
 
 # #保存
 # pd.to_pickle(file_dict, "anno_data.pkl")
-with open("anno_data_12.pkl", "wb") as anno_data:
-    pickle.dump(file_dict, anno_data) 
+with open("anno_data_step.pkl", "wb") as anno_data:
+    pickle.dump(file_dict, anno_data)
 
 # #読み出し
-# hoge = pd.read_pickle("anno_data.pkl") 
+# hoge = pd.read_pickle("anno_data.pkl")
 
 
 
@@ -37,7 +40,7 @@ with open("anno_data_12.pkl", "wb") as anno_data:
 ## ここから下は別ファイルに切り取ってもいいかもしれない
 # TODO: filepathを見て、fire_dictの中身を動画ごとに分割
 movie_dic = {}
-# 
+#
 # ↓
 # img_tensor: Tensor[(xxxx.pngのtensor, xxxx.pngのtensor, xxxx.pngのtensor]), label_tensor([1, 2, 3, 3, 5, ...])
 # この時点でエレメントはlabel_id化してしまっていいと思う
@@ -60,10 +63,10 @@ for filepath, element_label in file_dict.items():
 for mid, frames in movie_dic.items():
     movie_dic[mid] = sorted(frames, key=lambda x:x[2])
 
-with open("annotationed_movie_12.pkl", "wb") as annotationed_movie:
-    pickle.dump(movie_dic, annotationed_movie) 
+with open("annotationed_movie_step.pkl", "wb") as annotationed_movie:
+    pickle.dump(movie_dic, annotationed_movie)
 # pd.to_pickle(movie_dic, "annotationed_movie.pkl")
-# hoge2 = pd.read_pickle("annotationed_movie.pkl") 
+# hoge2 = pd.read_pickle("annotationed_movie.pkl")
 #print(hoge2)
 # TODO: bounding box, player等補助情報が増えた場合はdfを作成。それに伴いdataloader.pyも変更
 
@@ -71,7 +74,7 @@ with open("annotationed_movie_12.pkl", "wb") as annotationed_movie:
 # # TODO: dataloaderの形に合わせて保存
 # # movie_dict = {0: [(filename, label_id, frame_id), (), (), ]}
 # # ↓
-# # data = [ [[[]], [[]]] , [1,2, 4,0, ],   [[[]], [[]]] , [1,2, 4,0, ],   [[[]], [[]]] , [1,2, 4,0, ] ....  ] 
+# # data = [ [[[]], [[]]] , [1,2, 4,0, ],   [[[]], [[]]] , [1,2, 4,0, ],   [[[]], [[]]] , [1,2, 4,0, ] ....  ]
 
 # data = []
 # for mid, frames in movie_dic.items():  ##frames:(filename, label_id, frame_id)
@@ -92,7 +95,7 @@ with open("annotationed_movie_12.pkl", "wb") as annotationed_movie:
 
 # # pd.to_pickle(data, "train.pkl")
 # with open("train.pkl", "wb") as train:
-#     pickle.dump(data, train) 
+#     pickle.dump(data, train)
 # import pdb; pdb.set_trace()
 # print(data)
 
