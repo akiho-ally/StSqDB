@@ -6,11 +6,11 @@ from natsort import natsorted
 from PIL import Image
 import numpy as np
 
-# element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
-#turn
+element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
+##turn
 # element_names = ['Bracket', 'Counter_turn', 'Loop', 'Rocker_turn', 'Three_turn', 'Twizzle']
 #step
-element_names = ['Change_edge', 'Chasse', 'Choctaw', 'Cross_roll', 'Mohawk', 'Toe_step']
+# element_names = ['Change_edge', 'Chasse', 'Choctaw', 'Cross_roll', 'Mohawk', 'Toe_step']
 
 file_dict = {}
 
@@ -27,7 +27,7 @@ for element_name in element_names:
 
 # #保存
 # pd.to_pickle(file_dict, "anno_data.pkl")
-with open("anno_data_turn.pkl", "wb") as anno_data:
+with open("anno_data_three.pkl", "wb") as anno_data:
     pickle.dump(file_dict, anno_data)
 
 # #読み出し
@@ -56,13 +56,13 @@ for filepath, element_label in file_dict.items():
         mid = 1
     else:
          mid = int(mid)
-    # if  element_label =='Bracket' or element_label == 'Counter_turn' or element_label == 'Loop' or element_label == 'Rocker_turn' or element_label== 'Three_turn' or element_label =='Twizzle':
-    #     label_id = 0
-    # elif element_label=='Change_edge' or element_label ==  'Chasse' or element_label==  'Choctaw' or element_label==  'Cross_roll' or element_label== 'Mohawk' or element_label == 'Toe_step':
-    #     label_id = 1
-    # elif element_label == 'No_element':
-    #     label_id = 2
-    label_id = element_names.index(element_label)
+    if  element_label =='Bracket' or element_label == 'Counter_turn' or element_label == 'Loop' or element_label == 'Rocker_turn' or element_label== 'Three_turn' or element_label =='Twizzle':
+        label_id = 0
+    elif element_label=='Change_edge' or element_label ==  'Chasse' or element_label==  'Choctaw' or element_label==  'Cross_roll' or element_label== 'Mohawk' or element_label == 'Toe_step':
+        label_id = 1
+    elif element_label == 'No_element':
+        label_id = 2
+        # label_id = element_names.index(element_label)
     if mid in movie_dic.keys():
         movie_dic[mid].append((filepath, label_id, frame_id))
     else:
@@ -84,7 +84,7 @@ for mid, frames in movie_dic.items():
 
 
 
-with open("annotationed_movie_turn.pkl", "wb") as annotationed_movie:
+with open("annotationed_movie_3_class.pkl", "wb") as annotationed_movie:
     pickle.dump(movie_dic, annotationed_movie)
 # pd.to_pickle(movie_dic, "annotationed_movie.pkl")
 # hoge2 = pd.read_pickle("annotationed_movie.pkl")

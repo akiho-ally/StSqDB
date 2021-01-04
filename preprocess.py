@@ -12,32 +12,33 @@ def main():
     parser.add_argument('--seq_length', default=300)
     parser.add_argument('--img_size', default=224)
     # parser.add_argument('--use_no_element', action='store_true')
-    parser.add_argument('--turn', action='store_true')
-    parser.add_argument('--step', action='store_true')
+    # parser.add_argument('--turn', action='store_true')
+    # parser.add_argument('--step', action='store_true')
+    # parser.add_argument('--three', action='store_true')
     args = parser.parse_args()
 
 
     # 1. movie_dicの読み込み
-    if args.turn == True :
-        with open("annotationed_movie_turn.pkl", "rb") as annotationed_movie:
-            movie_dic = pickle.load(annotationed_movie)
-        print('turn file')
-    elif args.step == True :
-        with open("annotationed_movie_step.pkl", "rb") as annotationed_movie:
-            movie_dic = pickle.load(annotationed_movie)
-        print('step file')
-    else:
-        print('No!!')
-
-    # if args.use_no_element == False:
-    #     with open("annotationed_movie_12.pkl", "rb") as annotationed_movie:
+    # if args.turn == True :
+    #     with open("annotationed_movie_turn.pkl", "rb") as annotationed_movie:
     #         movie_dic = pickle.load(annotationed_movie)
+    #     print('turn file')
+    # elif args.step == True :
+    #     with open("annotationed_movie_step.pkl", "rb") as annotationed_movie:
+    #         movie_dic = pickle.load(annotationed_movie)
+    #     print('step file')
     # else:
-    #     with open("annotationed_movie.pkl", "rb") as annotationed_movie:
-    #         movie_dic = pickle.load(annotationed_movie)
+    #     print('No!!')
 
-        # 1つのmovie_data = (images, labels)
-        # data = [(images, labels), (images, labels), ..., (images, labels)]
+    if args.three == False:
+        with open("annotationed_movie_12.pkl", "rb") as annotationed_movie:
+            movie_dic = pickle.load(annotationed_movie)
+    else:
+        with open("annotationed_movie_3_class.pkl", "rb") as annotationed_movie:
+            movie_dic = pickle.load(annotationed_movie)
+
+        1つのmovie_data = (images, labels)
+        data = [(images, labels), (images, labels), ..., (images, labels)]
 
     # 2. 前処理
     data = []
@@ -162,27 +163,27 @@ def main():
         # TODO: movieをシャッフル
 #####################################################################################################
 
-        if args.turn == True:
-            with open("data/turn/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
-                pickle.dump(val_split, f)
-            with open("data/turn/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
-                pickle.dump(train_split, f)
-        elif args.step == True:
-            with open("data/step/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
-                pickle.dump(val_split, f)
-            with open("data/step/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
-                pickle.dump(train_split, f)
+        # if args.turn == True:
+        #     with open("data/turn/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+        #         pickle.dump(val_split, f)
+        #     with open("data/turn/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+        #         pickle.dump(train_split, f)
+        # elif args.step == True:
+        #     with open("data/step/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+        #         pickle.dump(val_split, f)
+        #     with open("data/step/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+        #         pickle.dump(train_split, f)
 
-        # if args.use_no_element == False:
-        #     with open("data/no_ele/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
-        #         pickle.dump(val_split, f)
-        #     with open("data/no_ele/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
-        #         pickle.dump(train_split, f)
-        # else:
-        #     with open("data/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
-        #         pickle.dump(val_split, f)
-        #     with open("data/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
-        #         pickle.dump(train_split, f)
+        if args.three == False:
+            with open("data/no_ele/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+                pickle.dump(val_split, f)
+            with open("data/no_ele/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length,i), "wb") as f:
+                pickle.dump(train_split, f)
+        else:
+            with open("data/three/seq_length_{}/val_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+                pickle.dump(val_split, f)
+            with open("data/three/seq_length_{}/train_split_{:1d}.pkl".format(args.seq_length, i), "wb") as f:
+                pickle.dump(train_split, f)
 ######################################################################################################
         print("finish {}".format(i))
 

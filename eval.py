@@ -15,34 +15,34 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def eval(model, split, seq_length, bs, n_cpu, disp):
 
-    if turn == True:
-        dataset = StsqDB(data_file='data/turn/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
-                        vid_dir='data/videos_56/',
-                        seq_length=int(seq_length),
-                        transform=transforms.Compose([ToTensor(),
-                                                    Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
-                        train=False)
-    elif step == True:
-        dataset = StsqDB(data_file='data/step/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
-                        vid_dir='data/videos_56/',
-                        seq_length=int(seq_length),
-                        transform=transforms.Compose([ToTensor(),
-                                                    Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
-                        train=False)
-    # if use_no_element == False:
-    #     dataset = StsqDB(data_file='data/no_ele/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
+    # if turn == True:
+    #     dataset = StsqDB(data_file='data/turn/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
     #                     vid_dir='data/videos_56/',
     #                     seq_length=int(seq_length),
     #                     transform=transforms.Compose([ToTensor(),
     #                                                 Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
     #                     train=False)
-    # else:
-    #     dataset = StsqDB(data_file='data/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
-    #                 vid_dir='data/videos_56/',
-    #                 seq_length=int(seq_length),
-    #                 transform=transforms.Compose([ToTensor(),
-    #                                             Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
-    #                 train=True)
+    # elif step == True:
+    #     dataset = StsqDB(data_file='data/step/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
+    #                     vid_dir='data/videos_56/',
+    #                     seq_length=int(seq_length),
+    #                     transform=transforms.Compose([ToTensor(),
+    #                                                 Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+    #                     train=False)
+    if three == False:
+        dataset = StsqDB(data_file='data/no_ele/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
+                        vid_dir='data/videos_56/',
+                        seq_length=int(seq_length),
+                        transform=transforms.Compose([ToTensor(),
+                                                    Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+                        train=False)
+    else:
+        dataset = StsqDB(data_file='data/three/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
+                    vid_dir='data/videos_56/',
+                    seq_length=int(seq_length),
+                    transform=transforms.Compose([ToTensor(),
+                                                Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+                    train=True)
 
     data_loader = DataLoader(dataset,
                              batch_size=int(bs),
@@ -52,33 +52,33 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
 
     correct = []
 
-    if turn == True:
-        element_correct = [ [] for i in range(6) ]
-        element_sum = [ [] for i in range(6)]
-        confusion_matrix = np.zeros([6,6], int)
-    if step == True:
-        element_correct = [ [] for i in range(6) ]
-        element_sum = [ [] for i in range(6)]
-        confusion_matrix = np.zeros([6,6], int)
-    # if use_no_element == False:
-    #     element_correct = [ [] for i in range(12) ]
-    #     element_sum = [ [] for i in range(12)]
-    #     confusion_matrix = np.zeros([12,12], int)
-    # else:
-    #     element_correct = [ [] for i in range(13) ]
-    #     element_sum = [ [] for i in range(13)]
-    #     confusion_matrix = np.zeros([13,13], int)
+    # if turn == True:
+    #     element_correct = [ [] for i in range(6) ]
+    #     element_sum = [ [] for i in range(6)]
+    #     confusion_matrix = np.zeros([6,6], int)
+    # if step == True:
+    #     element_correct = [ [] for i in range(6) ]
+    #     element_sum = [ [] for i in range(6)]
+    #     confusion_matrix = np.zeros([6,6], int)
+    if three == False:
+        element_correct = [ [] for i in range(12) ]
+        element_sum = [ [] for i in range(12)]
+        confusion_matrix = np.zeros([12,12], int)
+    else:
+        element_correct = [ [] for i in range(3) ]
+        element_sum = [ [] for i in range(3)]
+        confusion_matrix = np.zeros([3,3], int)
 
     for i, sample in enumerate(data_loader):
         images, labels = sample['images'].to(device), sample['labels'].to(device)
         logits = model(images)
         probs = F.softmax(logits.data, dim=1)  ##確率
         labels = labels.view(int(bs)*int(seq_length))
-        # _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),use_no_element)
-        if turn == True:
-            _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),turn)
-        elif step == True:
-            _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),step)
+        _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),three)
+        # if turn == True:
+        #     _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),turn)
+        # elif step == True:
+        #     _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),step)
         if disp:
             print(i, c)
         correct.append(c)
@@ -104,8 +104,9 @@ if __name__ == '__main__':
     parser.add_argument('--seq_length', default=300)
     parser.add_argument('--model_num', default=900)
     # parser.add_argument('--use_no_element', action='store_true')
-    parser.add_argument('--turn', action='store_true')
-    parser.add_argument('--step', action='store_true')
+    # parser.add_argument('--turn', action='store_true')
+    # parser.add_argument('--step', action='store_true')
+    parser.add_argument('--three', action='store_true')
     args = parser.parse_args()
 
 
@@ -115,8 +116,9 @@ if __name__ == '__main__':
     bs = args.batch_size
 
     # use_no_element = args.use_no_element
-    turn = args.turn
-    step = args.step
+    # turn = args.turn
+    # step = args.step
+    three = args.three
 
     model = EventDetector(pretrain=True,
                           width_mult=1.,
@@ -125,33 +127,35 @@ if __name__ == '__main__':
                           device=device,
                           bidirectional=True,
                           dropout=False,
-                          turn = turn,
-                          step = step)
+                        #   turn = turn,
+                        #   step = step
+                        three = three
+                          )
                         #   use_no_element=use_no_element)
 
-    if turn == True:
-        save_dict = torch.load('models/turn/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
+    # if turn == True:
+    #     save_dict = torch.load('models/turn/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
 
-    elif step == True:
-        save_dict = torch.load('models/step/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
-    # if use_no_element == False:
-    #     save_dict = torch.load('models/vgg/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
-    # else:
-    #     save_dict = torch.load('models/vgg/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
+    # elif step == True:
+    #     save_dict = torch.load('models/step/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
+    if three == False:
+        save_dict = torch.load('models/vgg/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
+    else:
+        save_dict = torch.load('models/three/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
     model.load_state_dict(save_dict['model_state_dict'])
     model.to(device)
     model.eval()
     PCE, element_PCE, all_element_correct, all_element_sum, confusion_matrix = eval(model, split, seq_length, bs, n_cpu, True)
     print('Average PCE: {}'.format(PCE))
 
-    if turn == True:
-        element_names = ['Bracket', 'Counter_turn', 'Loop', 'Rocker_turn', 'Three_turn', 'Twizzle']
-    if step == True:
-        element_names = ['Change_edge', 'Chasse', 'Choctaw', 'Cross_roll', 'Mohawk', 'Toe_step']
-    # if use_no_element == False:
-    #     element_names = ['Bracket', 'Change_edge', 'Chasse','Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle']
-    # else:
-    #     element_names = ['Bracket', 'Change_edge', 'Chasse','Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
+    # if turn == True:
+    #     element_names = ['Bracket', 'Counter_turn', 'Loop', 'Rocker_turn', 'Three_turn', 'Twizzle']
+    # if step == True:
+    #     element_names = ['Change_edge', 'Chasse', 'Choctaw', 'Cross_roll', 'Mohawk', 'Toe_step']
+    if three == False:
+        element_names = ['Bracket', 'Change_edge', 'Chasse','Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle']
+    else:
+        element_names = ['Turn','Step','No_element']
 
 
 
@@ -163,38 +167,38 @@ if __name__ == '__main__':
     ####################################################################
     print(confusion_matrix)
     fig, ax = plt.subplots(1,1,figsize=(8,8))
-    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=13000, cmap=plt.get_cmap('Blues'))
-    if turn == True:
-        plt.ylabel('Actual Category')
-        plt.yticks(range(6), element_names)
-        plt.xlabel('Predicted Category')
-        plt.xticks(range(6), element_names)
-
-
-        save_dir = '/home/akiho/projects/StSqDB/'
-        plt.savefig(save_dir + 'turn_figure.png')
-    elif step == True:
-        plt.ylabel('Actual Category')
-        plt.yticks(range(6), element_names)
-        plt.xlabel('Predicted Category')
-        plt.xticks(range(6), element_names)
-
-        save_dir = '/home/akiho/projects/StSqDB/'
-        plt.savefig(save_dir + 'step_figure.png')
-    # if args.use_no_element == False:
+    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=700000, cmap=plt.get_cmap('Blues'))
+    # if turn == True:
     #     plt.ylabel('Actual Category')
-    #     plt.yticks(range(12), element_names)
+    #     plt.yticks(range(6), element_names)
     #     plt.xlabel('Predicted Category')
-    #     plt.xticks(range(12), element_names)
+    #     plt.xticks(range(6), element_names)
+
 
     #     save_dir = '/home/akiho/projects/StSqDB/'
-    #     plt.savefig(save_dir + 'vgg_figure_12.png')
-
-    # else:
+    #     plt.savefig(save_dir + 'turn_figure.png')
+    # elif step == True:
     #     plt.ylabel('Actual Category')
-    #     plt.yticks(range(13), element_names)
+    #     plt.yticks(range(6), element_names)
     #     plt.xlabel('Predicted Category')
-    #     plt.xticks(range(13), element_names)
+    #     plt.xticks(range(6), element_names)
 
     #     save_dir = '/home/akiho/projects/StSqDB/'
-    #     plt.savefig(save_dir + 'vgg_figure_13.png')
+    #     plt.savefig(save_dir + 'step_figure.png')
+    if args.three == False:
+        plt.ylabel('Actual Category')
+        plt.yticks(range(12), element_names)
+        plt.xlabel('Predicted Category')
+        plt.xticks(range(12), element_names)
+
+        save_dir = '/home/akiho/projects/StSqDB/'
+        plt.savefig(save_dir + 'vgg_figure_12.png')
+
+    else:
+        plt.ylabel('Actual Category')
+        plt.yticks(range(3), element_names)
+        plt.xlabel('Predicted Category')
+        plt.xticks(range(3), element_names)
+
+        save_dir = '/home/akiho/projects/StSqDB/'
+        plt.savefig(save_dir + 'three_figure.png')

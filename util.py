@@ -21,7 +21,7 @@ class AverageMeter(object):
 
 
 
-def correct_preds(probs, labels, turn, tol=-1):
+def correct_preds(probs, labels, three, tol=-1):
 
 
     # events, _  = np.where(labels < 13)
@@ -50,9 +50,9 @@ def correct_preds(probs, labels, turn, tol=-1):
     preds = np.zeros(len(labels))
     correct = []
 
-    each_element_sum = np.zeros(6)
-    each_element_preds = np.zeros(6)
-    confusion_matrix = np.zeros([6,6], int)
+    each_element_sum = np.zeros(3)
+    each_element_preds = np.zeros(3)
+    confusion_matrix = np.zeros([3,3], int)
     # if use_no_element == False:
     #     each_element_sum = np.zeros(12)
     #     each_element_preds = np.zeros(12)

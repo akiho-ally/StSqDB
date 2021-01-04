@@ -26,8 +26,9 @@ class StsqDB(Dataset):
     @property
     def element(self):
         # ['Bracket', 'Change_edge', 'Chasse','Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
-        ['Bracket', 'Counter_turn', 'Loop', 'Rocker_turn', 'Three_turn', 'Twizzle']
+        # ['Bracket', 'Counter_turn', 'Loop', 'Rocker_turn', 'Three_turn', 'Twizzle']
         # ['Change_edge', 'Chasse', 'Choctaw', 'Cross_roll', 'Mohawk', 'Toe_step']
+        ['Turn','Step','No_element']
 
     def get_element_name(self, id):
         return self.element[id]
