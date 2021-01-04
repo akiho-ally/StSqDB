@@ -29,12 +29,6 @@ def main():
     else:
         print('No!!')
 
-    # if args.use_no_element == False:
-    #     with open("annotationed_movie_12.pkl", "rb") as annotationed_movie:
-    #         movie_dic = pickle.load(annotationed_movie)
-    # else:
-    #     with open("annotationed_movie.pkl", "rb") as annotationed_movie:
-    #         movie_dic = pickle.load(annotationed_movie)
 
         # 1つのmovie_data = (images, labels)
         # data = [(images, labels), (images, labels), ..., (images, labels)]
