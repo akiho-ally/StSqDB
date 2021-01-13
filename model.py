@@ -15,13 +15,13 @@ class EventDetector(nn.Module):
         self.device = device
         self.use_no_element = use_no_element
 
-        # #モデルの読み込み
-        # net = MobileNetV2(width_mult=width_mult)
-        # state_dict_mobilenet = torch.load('mobilenet_v2.pth.tar')
-        # if pretrain:
-        #     net.load_state_dict(state_dict_mobilenet,strict=False)
+        #モデルの読み込み
+        net = MobileNetV2(width_mult=width_mult)
+        state_dict_mobilenet = torch.load('mobilenet_v2.pth.tar')
+        if pretrain:
+            net.load_state_dict(state_dict_mobilenet,strict=False)
 
-        # self.cnn = nn.Sequential(*list(net.children())[0][:19])
+        self.cnn = nn.Sequential(*list(net.children())[0][:19])
 
 
 
@@ -32,16 +32,16 @@ class EventDetector(nn.Module):
         # alexnet = models.alexnet(pretrained=True)
         # self.cnn = alexnet
 
-        # #VGG
-        vgg16 = models.vgg16(pretrained=True)
-        self.cnn = vgg16
+        # # #VGG
+        # vgg16 = models.vgg16(pretrained=True)
+        # self.cnn = vgg16
 
         # #densenet
         # densenet = models.densenet161(pretrained=True)
         # self.cnn = densenet
 
 
-        self.rnn = nn.LSTM(int(1000*width_mult if width_mult > 1.0 else 1000),
+        self.rnn = nn.LSTM(int(1280*width_mult if width_mult > 1.0 else 1280),
                            self.lstm_hidden, self.lstm_layers,
                            batch_first=True, bidirectional=bidirectional)
         if self.use_no_element == False:
@@ -76,8 +76,8 @@ class EventDetector(nn.Module):
         c_in = x.view(batch_size * timesteps, C, H, W)  ##torch.Size([2400, 3, 224, 224])
         c_out = self.cnn(c_in)
 
-        # ##########
-        # c_out = c_out.mean(3).mean(2)  ##torch.Size([2400, 1280])  ##Global average pooling
+        ##########
+        c_out = c_out.mean(3).mean(2)  ##torch.Size([2400, 1280])  ##Global average pooling
         ##########
         if self.dropout:
             c_out = self.drop(c_out)

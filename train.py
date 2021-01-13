@@ -107,8 +107,8 @@ if __name__ == '__main__':
     losses = AverageMeter()
     #print('utils.py, class AverageMeter()')
 
-    if not os.path.exists('models/vgg/seq_length_{}'.format(args.seq_length)):
-        os.mkdir('models/vgg/seq_length_{}'.format(args.seq_length))
+    # if not os.path.exists('models/mobel/seq_length_{}'.format(args.seq_length)):
+    #     os.mkdir('models/vgg/seq_length_{}'.format(args.seq_length))
 
 
 
@@ -134,14 +134,14 @@ if __name__ == '__main__':
             epoch += 1
             if epoch % it_save == 0:
                 torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                            'model_state_dict': model.state_dict()}, 'models/vgg/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                            'model_state_dict': model.state_dict()}, 'models/mobile/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
             if epoch == iterations:
                 break
         else:
             epoch += 1
             if epoch % it_save == 0:
                 torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                            'model_state_dict': model.state_dict()}, 'models/vgg/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                            'model_state_dict': model.state_dict()}, 'models/mobile/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
             if epoch == iterations:
                 break
 
