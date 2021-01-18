@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 from MobileNetV2 import MobileNetV2
 import torchvision.models as models
+import matplotlib.pyplot as plt
 
 class EventDetector(nn.Module):
     def __init__(self, pretrain, width_mult, lstm_layers, lstm_hidden, device, use_no_element, bidirectional=True, dropout=True):
@@ -15,30 +16,21 @@ class EventDetector(nn.Module):
         self.device = device
         self.use_no_element = use_no_element
 
-        #モデルの読み込み
+
+        # #モデルの読み込み
         net = MobileNetV2(width_mult=width_mult)
         state_dict_mobilenet = torch.load('mobilenet_v2.pth.tar')
         if pretrain:
             net.load_state_dict(state_dict_mobilenet,strict=False)
 
-        self.cnn = nn.Sequential(*list(net.children())[0][:19])
+        self.cnn = nn.Sequential(*list(net.children())[0][:19])  ##self.feature
+        self.attn_conv = nn.Sequential(
+            nn.Conv2d(1280, 1, 1),
+            nn.Sigmoid())
+
+        self.mask = None
 
 
-
-        #resnet版
-        # self.cnn = torch.hub.load('pytorch/vision:v0.6.0', 'resnet18', pretrained=True)
-
-        # #alexnet版
-        # alexnet = models.alexnet(pretrained=True)
-        # self.cnn = alexnet
-
-        # # #VGG
-        # vgg16 = models.vgg16(pretrained=True)
-        # self.cnn = vgg16
-
-        # #densenet
-        # densenet = models.densenet161(pretrained=True)
-        # self.cnn = densenet
 
 
         self.rnn = nn.LSTM(int(1280*width_mult if width_mult > 1.0 else 1280),
@@ -74,11 +66,19 @@ class EventDetector(nn.Module):
 
         # CNN forward
         c_in = x.view(batch_size * timesteps, C, H, W)  ##torch.Size([2400, 3, 224, 224])
-        c_out = self.cnn(c_in)
+        c_out = self.cnn(c_in)  ##torch.Size([2400, 1280, 7, 7])##特徴マップ
+        attn = self.attn_conv(c_out) ##[2400,1,7,7]  ##Attentionマスク
 
-        ##########
+        self.mask_ = attn.detach().cpu()
+
+
+
+
+        c_out = c_out * attn
+
         c_out = c_out.mean(3).mean(2)  ##torch.Size([2400, 1280])  ##Global average pooling
-        ##########
+
+
         if self.dropout:
             c_out = self.drop(c_out)
 
@@ -94,3 +94,17 @@ class EventDetector(nn.Module):
             out = out.view(batch_size*timesteps, 13)
         # out.shape => torch.Size([300, 13])
         return out
+
+    # def save_attention_mask(self, x, path):
+    #     B = x.shape[0]
+    #     self.forward(x)
+        # x = x.cpu() * torch.Tensor([0.229, 0.224, 0.225]).reshape(-1, 1, 1)
+        # x = x + torch.Tensor([0.485, 0.456, 0.406]).reshape(-1, 1, 1)
+        # fig, axs = plt.subplots(4, 2, figsize=(6, 8))
+        # plt.axis('off')
+        # for i in range(4):
+        #     axs[i, 0].imshow(x[0][i].permute(1, 2,0))
+        #     axs[i, 1].imshow(self.mask_[i][0])
+        #     plt.savefig('/home/akiho/projects/golfdb/sample.png')
+    #     plt.savefig(path)
+    #     plt.close()
