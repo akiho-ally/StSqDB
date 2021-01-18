@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     split = args.split
     seq_length = args.seq_length
-    n_cpu = 6
+    n_cpu = 0
     bs = args.batch_size
 
     use_no_element = args.use_no_element
@@ -98,9 +98,9 @@ if __name__ == '__main__':
                           use_no_element=use_no_element)
 
     if use_no_element == False:
-        save_dict = torch.load('models/vgg/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
+        save_dict = torch.load('models/mobile/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
     else:
-        save_dict = torch.load('models/vgg/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
+        save_dict = torch.load('models/mobile/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
     model.load_state_dict(save_dict['model_state_dict'])
     model.to(device)
     model.eval()
@@ -122,7 +122,7 @@ if __name__ == '__main__':
     ####################################################################
     print(confusion_matrix)
     fig, ax = plt.subplots(1,1,figsize=(8,6))
-    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=13000, cmap=plt.get_cmap('Blues'))
+    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=20000, cmap=plt.get_cmap('Blues'))
     if args.use_no_element == False:
         plt.ylabel('Actual Category')
         plt.yticks(range(12), element_names)

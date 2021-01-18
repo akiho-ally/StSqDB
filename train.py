@@ -36,7 +36,7 @@ if __name__ == '__main__':
     split = args.split
     iterations = args.iteration
     it_save = args.it_save # save model every 100 iterations
-    n_cpu = 6
+    n_cpu = 0
     seq_length = args.seq_length
     bs = args.batch_size  # batch size
     k = 10  # frozen layers
@@ -82,7 +82,7 @@ if __name__ == '__main__':
                     train=True)
     print('dataloader.py, class StsqDB()')
     # dataset.__len__() : 1050
-
+    print(os.cpu_count() )
 
     data_loader = DataLoader(dataset,
                              batch_size=int(bs),
