@@ -3,6 +3,8 @@ import pickle
 
 from PIL import Image
 import numpy as np
+from natsort import natsorted
+import collections
 
 element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
 # element_names = ['Bracket', 'Change_edge', 'Chasse', 'Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle']
@@ -13,30 +15,42 @@ eval_file_dict = {}
 for element_name in element_names:
     # 'Bracket', 'Change_edge'
     #dir_path = '/Users/akiho/projects/d-hacks/skate/dataset/train/' + element_name
-    dir_path = '/home/akiho/projects/StSqDB/data/dataset/train_all/' + element_name
+    dir_path = '/home/akiho/projects/golfdb/data/dataset/train_all/' + element_name
     # '/Users/akiho/projects/d-hacks/skate/dataset/train/Bracket')
-    files_all = sorted(os.listdir(dir_path))
+    files_all = natsorted(os.listdir(dir_path))
     # [file, file, file, ..., .DS_store]
-    train_files = files_all[1:151]
-    eval_files = files_all[151:181]
+    ######################################
+    train_files = files_all[0:345]
+    eval_files = files_all[345:431]
+
     for train_file in train_files:
+        label_id = element_names.index(element_name)
+        mid = train_file.split("_")[0].replace("img", "")
         if not train_file.startswith('.'):
-            train_file_dict[train_file] = element_name
-    import pdb; pdb.set_trace()
+            train_file_dict[train_file] = (mid, label_id)
+
+
     for eval_file in eval_files:
+        label_id = element_names.index(element_name)
+        mid = eval_file.split("_")[0].replace("img", "")
         if not eval_file.startswith('.'):
-            eval_file_dict[eval_file] = element_name
-    import pdb; pdb.set_trace()
+            eval_file_dict[eval_file] = (mid, label_id)
+
+
+    #########################################
+
+
+
 
 # #保存
 # pd.to_pickle(file_dict, "anno_data.pkl")
 with open("anno_data_train.pkl", "wb") as anno_data_t:
-    pickle.dump(train_file_dict, anno_data_t) 
+    pickle.dump(train_file_dict, anno_data_t)
 with open("anno_data_eval.pkl", "wb") as anno_data_e:
-    pickle.dump(eval_file_dict, anno_data_e) 
+    pickle.dump(eval_file_dict, anno_data_e)
 
 # #読み出し
-# hoge = pd.read_pickle("anno_data.pkl") 
+# hoge = pd.read_pickle("anno_data.pkl")
 
 
 
@@ -44,7 +58,7 @@ with open("anno_data_eval.pkl", "wb") as anno_data_e:
 
 
 # train_movie_dic = {}
-# # 
+# #
 # # ↓
 # # img_tensor: Tensor[(xxxx.pngのtensor, xxxx.pngのtensor, xxxx.pngのtensor]), label_tensor([1, 2, 3, 3, 5, ...])
 # # この時点でエレメントはlabel_id化してしまっていいと思う
@@ -68,11 +82,11 @@ with open("anno_data_eval.pkl", "wb") as anno_data_e:
 #     train_movie_dic[mid] = sorted(frames, key=lambda x:x[2])
 
 # with open("annotationed_movie_train.pkl", "wb") as annotationed_movie:
-#     pickle.dump(train_movie_dic, annotationed_movie) 
+#     pickle.dump(train_movie_dic, annotationed_movie)
 
 
 # eval_movie_dic = {}
-# # 
+# #
 # # ↓
 # # img_tensor: Tensor[(xxxx.pngのtensor, xxxx.pngのtensor, xxxx.pngのtensor]), label_tensor([1, 2, 3, 3, 5, ...])
 # # この時点でエレメントはlabel_id化してしまっていいと思う
@@ -96,7 +110,7 @@ with open("anno_data_eval.pkl", "wb") as anno_data_e:
 #     eval_movie_dic[mid] = sorted(frames, key=lambda x:x[2])
 
 # with open("annotationed_movie_eval.pkl", "wb") as annotationed_movie:
-#     pickle.dump(eval_movie_dic, annotationed_movie) 
+#     pickle.dump(eval_movie_dic, annotationed_movie)
 
 
 
@@ -115,7 +129,7 @@ with open("anno_data_eval.pkl", "wb") as anno_data_e:
 
 
 # pd.to_pickle(movie_dic, "annotationed_movie.pkl")
-# hoge2 = pd.read_pickle("annotationed_movie.pkl") 
+# hoge2 = pd.read_pickle("annotationed_movie.pkl")
 #print(hoge2)
 # TODO: bounding box, player等補助情報が増えた場合はdfを作成。それに伴いdataloader.pyも変更
 
@@ -123,7 +137,7 @@ with open("anno_data_eval.pkl", "wb") as anno_data_e:
 # # TODO: dataloaderの形に合わせて保存
 # # movie_dict = {0: [(filename, label_id, frame_id), (), (), ]}
 # # ↓
-# # data = [ [[[]], [[]]] , [1,2, 4,0, ],   [[[]], [[]]] , [1,2, 4,0, ],   [[[]], [[]]] , [1,2, 4,0, ] ....  ] 
+# # data = [ [[[]], [[]]] , [1,2, 4,0, ],   [[[]], [[]]] , [1,2, 4,0, ],   [[[]], [[]]] , [1,2, 4,0, ] ....  ]
 
 # data = []
 # for mid, frames in movie_dic.items():  ##frames:(filename, label_id, frame_id)
@@ -144,7 +158,7 @@ with open("anno_data_eval.pkl", "wb") as anno_data_e:
 
 # # pd.to_pickle(data, "train.pkl")
 # with open("train.pkl", "wb") as train:
-#     pickle.dump(data, train) 
+#     pickle.dump(data, train)
 # import pdb; pdb.set_trace()
 # print(data)
 

@@ -11,10 +11,10 @@ import matplotlib.pyplot as plt
 
 import argparse
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+device = torch.device('cpu')
 def eval(model, split, seq_length, bs, n_cpu, disp):
-    
+
     if use_no_element == False:
         dataset = StsqDB(data_file='data/no_ele/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
                         vid_dir='data/videos_40/',
@@ -23,8 +23,8 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
                                                     Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
                         train=False)
     else:
-        dataset = StsqDB(data_file='data/same_frames/val_split_1.pkl',
-                    vid_dir='data/videos_40/',
+        dataset = StsqDB(data_file='data/sameframes/seq_length_{}/val_split_1.pkl'.format(int(seq_length)),
+                    vid_dir='data/videos_56/',
                     seq_length=int(seq_length),
                     transform=transforms.Compose([ToTensor(),
                                                 Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
@@ -49,7 +49,7 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
 
     for i, sample in enumerate(data_loader):
         images, labels = sample['images'].to(device), sample['labels'].to(device)
-        logits = model(images) 
+        logits, _ = model(images)
         probs = F.softmax(logits.data, dim=1)  ##確率
         labels = labels.view(int(bs)*int(seq_length))
         _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),use_no_element)
@@ -75,15 +75,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--split', default=1)
     parser.add_argument('--batch_size', default=4)
-    parser.add_argument('--seq_length', default=300) 
+    parser.add_argument('--seq_length', default=300)
     parser.add_argument('--model_num', default=900)
-    parser.add_argument('--use_no_element', action='store_true') 
-    args = parser.parse_args() 
+    parser.add_argument('--use_no_element', action='store_true')
+    args = parser.parse_args()
 
 
     split = args.split
     seq_length = args.seq_length
-    n_cpu = 6
+    n_cpu = 0
     bs = args.batch_size
 
     use_no_element = args.use_no_element
@@ -97,11 +97,11 @@ if __name__ == '__main__':
                           dropout=False,
                           use_no_element=use_no_element)
 
-    save_dict = torch.load('models/swingnet_{}.pth.tar'.format(args.model_num))
+    save_dict = torch.load('models/sameframes/seq_length_{}/swingnet_{}.pth.tar'.format(int(seq_length), args.model_num))
     model.load_state_dict(save_dict['model_state_dict'])
     model.to(device)
     model.eval()
-    PCE, element_PCE, all_element_correct, all_element_sum, confusion_matrix = eval(model, split, seq_length, bs, n_cpu, True)
+    PCE, element_PCE, all_element_correct, all_element_sum, confusion_matrix = eval(model, split, int(seq_length), bs, n_cpu, True)
     print('Average PCE: {}'.format(PCE))
 
     if use_no_element == False:
@@ -115,25 +115,25 @@ if __name__ == '__main__':
         element_name = element_names[j]
         print('{}: {}  ({} / {})'.format(element_name, element_PCE[j], all_element_correct[j], all_element_sum[j]))
 
-    
+
     ####################################################################
     print(confusion_matrix)
     fig, ax = plt.subplots(1,1,figsize=(8,6))
-    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=90, cmap=plt.get_cmap('Blues'))
+    ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=250, cmap=plt.get_cmap('Blues'))
     if args.use_no_element == False:
         plt.ylabel('Actual Category')
         plt.yticks(range(12), element_names)
         plt.xlabel('Predicted Category')
         plt.xticks(range(12), element_names)
 
-        save_dir = '/home/akiho/projects/StSqDB/'
+        save_dir = '/home/akiho/projects/golfdb/'
         plt.savefig(save_dir + 'figure_12.png')
 
     else:
         plt.ylabel('Actual Category')
         plt.yticks(range(13), element_names)
         plt.xlabel('Predicted Category')
-        plt.xticks(range(13), element_names)      
+        plt.xticks(range(13), element_names)
 
-        save_dir = '/home/akiho/projects/StSqDB/'
-        plt.savefig(save_dir + 'f_same_frames_30_2.png')
+        save_dir = '/home/akiho/projects/golfdb/'
+        plt.savefig(save_dir + 'f_same_frames_86.png')

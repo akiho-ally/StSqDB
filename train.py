@@ -7,6 +7,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
 import os
+import matplotlib.pyplot as plt
 
 
 import argparse
@@ -15,11 +16,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--split', default=1)
     parser.add_argument('--iteration', default=8000)
-    parser.add_argument('--it_save', default=10)
+    parser.add_argument('--it_save', default=50)
     parser.add_argument('--batch_size', default=8)
-    parser.add_argument('--seq_length', default=300) 
-    parser.add_argument('--use_no_element', action='store_true') 
-    args = parser.parse_args() 
+    parser.add_argument('--seq_length', default=300)
+    parser.add_argument('--use_no_element', action='store_true')
+    args = parser.parse_args()
     # これ以降、このファイル内では "args.iterration" で2000とか呼び出せるようになる
 
     experiment = Experiment(api_key='d7Xjw6KSK6KL7pUOhXJvONq9j', project_name='stsqdb')
@@ -68,14 +69,14 @@ if __name__ == '__main__':
     # TODO: vid_dirのpathをかえる。stsqの動画を切り出したimage全部が含まれているdirにする
     if use_no_element == False:
         dataset = StsqDB(data_file='data/no_ele/seq_length_{}/train_split_{}.pkl'.format(args.seq_length, args.split),
-                        vid_dir='data/videos_40/',
+                        vid_dir='data/videos_56/',
                         seq_length=int(seq_length),
                         transform=transforms.Compose([ToTensor(),
                                                     Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
                         train=True)
     else:
-        dataset = StsqDB(data_file='data/same_frames/train_split_1.pkl',
-                    vid_dir='data/videos_40/',
+        dataset = StsqDB(data_file='data/sameframes/seq_length_{}/train_split_1.pkl'.format(args.seq_length),
+                    vid_dir='data/videos_56/',
                     seq_length=int(seq_length),
                     transform=transforms.Compose([ToTensor(),
                                                 Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
@@ -91,7 +92,7 @@ if __name__ == '__main__':
                              drop_last=True)
 
     # dataset.__len__() : 47 (dataset/bs)
-                  
+
 
     # the 8 golf swing events are classes 0 through 7, no-event is class 8
     # the ratio of events to no-events is approximately 1:35 so weight classes accordingly:
@@ -108,8 +109,8 @@ if __name__ == '__main__':
     losses = AverageMeter()
     #print('utils.py, class AverageMeter()')
 
-    if not os.path.exists('models'):
-        os.mkdir('models')
+    if not os.path.exists('models/sameframes/'):
+        os.mkdir('models/sameframes/')
 
 
 
@@ -119,30 +120,40 @@ if __name__ == '__main__':
 
         for sample in tqdm(data_loader):
             images, labels = sample['images'].to(device), sample['labels'].to(device)
-            logits = model(images.float())    
-            labels = labels.view(int(bs)*int(seq_length))  
+            logits, mask = model(images.float())
+            labels = labels.view(int(bs)*int(seq_length))
             loss = criterion(logits, labels)
             optimizer.zero_grad()
-            loss.backward() 
+            loss.backward()
             losses.update(loss.item(), images.size(0))
             optimizer.step()
 
-        
-            print('epoch: {}\tLoss: {loss.val:.4f} ({loss.avg:.4f})'.format(epoch, loss=losses))
 
-            if use_no_element == False:
-                epoch += 1
-                if epoch % int(it_save) == 0:
-                    torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                                'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(epoch))
-                if epoch == iterations:
-                    break
-            else:
-                epoch += 1
-                if epoch % int(it_save) == 0:
-                    torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                                'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(epoch))
-                if epoch == iterations:
-                    break
+            print('tLoss: {loss.val:.4f} ({loss.avg:.4f})'.format(loss=losses))
+
+        if use_no_element == False:
+            epoch += 1
+            if epoch % int(it_save) == 0:
+                torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                            'model_state_dict': model.state_dict()}, 'models/swingnet_{}.pth.tar'.format(epoch))
+            if epoch == iterations:
+                break
+        else:
+            epoch += 1
+            if epoch % int(it_save) == 0:
+                torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                            'model_state_dict': model.state_dict()}, 'models/sameframes/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+
+                x = images.cpu() * torch.Tensor([0.229, 0.224, 0.225]).reshape(-1, 1, 1)
+                x = x + torch.Tensor([0.485, 0.456, 0.406]).reshape(-1, 1, 1)
+                fig, axs = plt.subplots(4, 2, figsize=(6, 8))
+                plt.axis('off')
+                for i in range(4):
+                    axs[i, 0].imshow(x[0][i].permute(1, 2,0))
+                    axs[i, 1].imshow(mask[i][0])
+                plt.savefig('/home/akiho/projects/golfdb/attn_img/epoch' + str(epoch)  +  '.png')
+
+            if epoch == iterations:
+                break
 
         experiment.log_parameter("train_loss", loss.item(), step=epoch)
