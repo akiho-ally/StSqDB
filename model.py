@@ -3,7 +3,7 @@ import torch.nn as nn
 from torch.autograd import Variable
 from MobileNetV2 import MobileNetV2
 import torchvision.models as models
-import matplotlib.pyplot as plt
+
 
 class EventDetector(nn.Module):
     def __init__(self, pretrain, width_mult, lstm_layers, lstm_hidden, device, use_no_element, bidirectional=True, dropout=True):
@@ -71,9 +71,6 @@ class EventDetector(nn.Module):
 
         self.mask_ = attn.detach().cpu()
 
-
-
-
         c_out = c_out * attn
 
         c_out = c_out.mean(3).mean(2)  ##torch.Size([2400, 1280])  ##Global average pooling
@@ -93,7 +90,7 @@ class EventDetector(nn.Module):
         else:
             out = out.view(batch_size*timesteps, 13)
         # out.shape => torch.Size([300, 13])
-        return out
+        return out,  self.mask_
 
     # def save_attention_mask(self, x, path):
     #     B = x.shape[0]

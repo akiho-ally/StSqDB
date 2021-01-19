@@ -98,9 +98,9 @@ if __name__ == '__main__':
                           use_no_element=use_no_element)
 
     if use_no_element == False:
-        save_dict = torch.load('models/mobile/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
+        save_dict = torch.load('models/attention/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
     else:
-        save_dict = torch.load('models/mobile/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
+        save_dict = torch.load('models/attention/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, args.model_num))
     model.load_state_dict(save_dict['model_state_dict'])
     model.to(device)
     model.eval()

@@ -7,6 +7,7 @@ import torch
 from torch.utils.data import DataLoader
 from torchvision import transforms
 import os
+import matplotlib.pyplot as plt
 
 
 import argparse
@@ -117,9 +118,9 @@ if __name__ == '__main__':
     for epoch in range(int(iterations)):
         print(epoch)
 
-        for sample in tqdm(data_loader):
+        for idx, sample in enumerate(tqdm(data_loader)):
             images, labels = sample['images'].to(device), sample['labels'].to(device)
-            logits = model(images.float())
+            logits, mask = model(images.float())
             labels = labels.view(int(bs)*int(seq_length))
             loss = criterion(logits, labels)
             optimizer.zero_grad()
@@ -130,18 +131,28 @@ if __name__ == '__main__':
 
             print('Loss: {loss.val:.4f} ({loss.avg:.4f})'.format(loss=losses))
 
+            if idx % 500 == 0:
+                x = images.cpu() * torch.Tensor([0.229, 0.224, 0.225]).reshape(-1, 1, 1)
+                x = x + torch.Tensor([0.485, 0.456, 0.406]).reshape(-1, 1, 1)
+                fig, axs = plt.subplots(4, 2, figsize=(6, 8))
+                plt.axis('off')
+                for i in range(4):
+                    axs[i, 0].imshow(x[0][i].permute(1, 2,0))
+                    axs[i, 1].imshow(mask[i][0])
+                plt.savefig('/home/akiho/projects/StSqDB/attn_img/epoch' + str(epoch) + '_' + str(idx) +  '.png')
+
         if use_no_element == False:
             epoch += 1
             if epoch % it_save == 0:
                 torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                            'model_state_dict': model.state_dict()}, 'models/mobile/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                            'model_state_dict': model.state_dict()}, 'models/attention/no_ele/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
             if epoch == iterations:
                 break
         else:
             epoch += 1
             if epoch % it_save == 0:
                 torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                            'model_state_dict': model.state_dict()}, 'models/mobile/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+                            'model_state_dict': model.state_dict()}, 'models/attention/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
             if epoch == iterations:
                 break
 
