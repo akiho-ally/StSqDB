@@ -77,8 +77,7 @@ Toe_step: 0.023255813953488372 (6.0 / 258.0)
 Twizzle: 0.46511627906976744 (120.0 / 258.0)  
 No_element: 0.8255813953488372 (213.0 / 258.0) 
 sameframes 43 no_atten bs 16 epoch 300  
-sameframes 43 no_attn bs8 epoch600   
-sameframes 43 no_attn bs8 epoch600  
+
 
 
 Average PCE: 0.24657125819916517  
