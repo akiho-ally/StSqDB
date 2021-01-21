@@ -15,15 +15,8 @@ import argparse
 device = torch.device('cpu')
 def eval(model, split, seq_length, bs, n_cpu, disp):
 
-    if use_no_element == False:
-        dataset = StsqDB(data_file='data/no_ele/seq_length_{}/val_split_{}.pkl'.format(int(seq_length), split),
-                        vid_dir='data/videos_40/',
-                        seq_length=int(seq_length),
-                        transform=transforms.Compose([ToTensor(),
-                                                    Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
-                        train=False)
-    else:
-        dataset = StsqDB(data_file='data/sameframes/seq_length_{}/val_split_1.pkl'.format(int(seq_length)),
+    if three == True:
+        dataset = StsqDB(data_file='data/sameframes/three/seq_length_{}/val_split_1.pkl'.format(int(seq_length)),
                     vid_dir='data/videos_56/',
                     seq_length=int(seq_length),
                     transform=transforms.Compose([ToTensor(),
@@ -38,21 +31,17 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
 
     correct = []
 
-    if use_no_element == False:
-        element_correct = [ [] for i in range(12) ]
-        element_sum = [ [] for i in range(12)]
-        confusion_matrix = np.zeros([12,12], int)
-    else:
-        element_correct = [ [] for i in range(13) ]
-        element_sum = [ [] for i in range(13)]
-        confusion_matrix = np.zeros([13,13], int)
+    if three == True:
+        element_correct = [ [] for i in range(3) ]
+        element_sum = [ [] for i in range(3)]
+        confusion_matrix = np.zeros([3,3], int)
 
     for i, sample in enumerate(data_loader):
         images, labels = sample['images'].to(device), sample['labels'].to(device)
         logits, _ = model(images)
         probs = F.softmax(logits.data, dim=1)  ##確率
         labels = labels.view(int(bs)*int(seq_length))
-        _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),use_no_element)
+        _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),three)
         if disp:
             print(i, c)
         correct.append(c)
@@ -77,7 +66,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', default=4)
     parser.add_argument('--seq_length', default=300)
     parser.add_argument('--model_num', default=900)
-    parser.add_argument('--use_no_element', action='store_true')
+    parser.add_argument('--three', action='store_true')
     args = parser.parse_args()
 
 
@@ -86,7 +75,7 @@ if __name__ == '__main__':
     n_cpu = 0
     bs = args.batch_size
 
-    use_no_element = args.use_no_element
+    three = args.three
 
     model = EventDetector(pretrain=True,
                           width_mult=1.,
@@ -95,7 +84,7 @@ if __name__ == '__main__':
                           device=device,
                           bidirectional=True,
                           dropout=False,
-                          use_no_element=use_no_element)
+                          three=three)
 
     save_dict = torch.load('models/sameframes/seq_length_{}/swingnet_{}.pth.tar'.format(int(seq_length), args.model_num))
     model.load_state_dict(save_dict['model_state_dict'])
@@ -104,10 +93,8 @@ if __name__ == '__main__':
     PCE, element_PCE, all_element_correct, all_element_sum, confusion_matrix = eval(model, split, int(seq_length), bs, n_cpu, True)
     print('Average PCE: {}'.format(PCE))
 
-    if use_no_element == False:
-        element_names = ['Bracket', 'Change_edge', 'Chasse','Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle']
-    else:
-        element_names = ['Bracket', 'Change_edge', 'Chasse','Choctaw', 'Counter_turn', 'Cross_roll', 'Loop', 'Mohawk', 'Rocker_turn', 'Three_turn', 'Toe_step', 'Twizzle','No_element']
+    if three == True:
+        element_names = ['Step', 'Turn','No_element']
 
 
 
@@ -120,20 +107,11 @@ if __name__ == '__main__':
     print(confusion_matrix)
     fig, ax = plt.subplots(1,1,figsize=(8,6))
     ax.matshow(confusion_matrix, aspect='auto', vmin=0, vmax=250, cmap=plt.get_cmap('Blues'))
-    if args.use_no_element == False:
-        plt.ylabel('Actual Category')
-        plt.yticks(range(12), element_names)
-        plt.xlabel('Predicted Category')
-        plt.xticks(range(12), element_names)
-
-        save_dir = '/home/akiho/projects/golfdb/'
-        plt.savefig(save_dir + 'figure_12.png')
-
-    else:
+    if args.three == True:
         plt.ylabel('Actual Category')
         plt.yticks(range(13), element_names)
         plt.xlabel('Predicted Category')
         plt.xticks(range(13), element_names)
 
         save_dir = '/home/akiho/projects/golfdb/'
-        plt.savefig(save_dir + 'f_same_frames_86.png')
+        plt.savefig(save_dir + 'three_same_frames_43.png')

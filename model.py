@@ -6,7 +6,7 @@ import torchvision.models as models
 
 
 class EventDetector(nn.Module):
-    def __init__(self, pretrain, width_mult, lstm_layers, lstm_hidden, device, use_no_element, bidirectional=True, dropout=True):
+    def __init__(self, pretrain, width_mult, lstm_layers, lstm_hidden, device, three, bidirectional=True, dropout=True):
         super(EventDetector, self).__init__()
         self.width_mult = width_mult
         self.lstm_layers = lstm_layers
@@ -14,7 +14,7 @@ class EventDetector(nn.Module):
         self.bidirectional = bidirectional
         self.dropout = dropout
         self.device = device
-        self.use_no_element = use_no_element
+        self.three = three
 
 
         # #モデルの読み込み
@@ -24,11 +24,7 @@ class EventDetector(nn.Module):
             net.load_state_dict(state_dict_mobilenet,strict=False)
 
         self.cnn = nn.Sequential(*list(net.children())[0][:19])  ##self.feature
-        self.attn_conv = nn.Sequential(
-            nn.Conv2d(1280, 1, 1),
-            nn.Sigmoid())
 
-        self.mask = None
 
 
 
@@ -36,16 +32,11 @@ class EventDetector(nn.Module):
         self.rnn = nn.LSTM(int(1280*width_mult if width_mult > 1.0 else 1280),
                            self.lstm_hidden, self.lstm_layers,
                            batch_first=True, bidirectional=bidirectional)
-        if self.use_no_element == False:
+        if self.three == True:
             if self.bidirectional:
-                self.lin = nn.Linear(2*self.lstm_hidden, 12)
+                self.lin = nn.Linear(2*self.lstm_hidden, 3)
             else:
-                self.lin = nn.Linear(self.lstm_hidden, 12)
-        else:
-            if self.bidirectional:
-                self.lin = nn.Linear(2*self.lstm_hidden, 13)
-            else:
-                self.lin = nn.Linear(self.lstm_hidden, 13)
+                self.lin = nn.Linear(self.lstm_hidden, 3)
 
 
         if self.dropout:
@@ -67,11 +58,6 @@ class EventDetector(nn.Module):
         # CNN forward
         c_in = x.view(batch_size * timesteps, C, H, W)  ##torch.Size([2400, 3, 224, 224])
         c_out = self.cnn(c_in)  ##torch.Size([2400, 1280, 7, 7])##特徴マップ
-        attn = self.attn_conv(c_out) ##[2400,1,7,7]  ##Attentionマスク
-
-        self.mask_ = attn.detach().cpu()
-
-        c_out = c_out * attn
 
         c_out = c_out.mean(3).mean(2)  ##torch.Size([2400, 1280])  ##Global average pooling
 
@@ -85,11 +71,9 @@ class EventDetector(nn.Module):
         r_out, states = self.rnn(r_in, self.hidden)  ##r_out:torch.Size([8, 300, 512]),  len(states)=2
         out = self.lin(r_out)  ##torch.Size([8, 300, 12])
         # out.shape => torch.Size([1, 300, 13])
-        if self.use_no_element == False:
-            out = out.view(batch_size*timesteps, 12)
-        else:
-            out = out.view(batch_size*timesteps, 13)
+        if self.three == True:
+            out = out.view(batch_size*timesteps, 3)
         # out.shape => torch.Size([300, 13])
-        return out,  self.mask_
+        return out,
 
 
