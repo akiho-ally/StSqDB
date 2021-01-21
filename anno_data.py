@@ -20,22 +20,39 @@ for element_name in element_names:
     files_all = natsorted(os.listdir(dir_path))
     # [file, file, file, ..., .DS_store]
     ######################################
-    train_files = files_all[0:345]
-    eval_files = files_all[345:431]
+    if element_name =='No_element':
+        train_files = files_all[0:2064]
+        eval_files = files_all[2064:2580]
+    else:
+        train_files = files_all[0:344]
+        eval_files = files_all[344:430]
+    import pdb; pdb.set_trace()
 
     for train_file in train_files:
-        label_id = element_names.index(element_name)
+        if  element_name =='Bracket' or element_name == 'Counter_turn' or element_name == 'Loop' or element_name == 'Rocker_turn' or element_name== 'Three_turn' or element_name =='Twizzle':
+            label_id = 0
+        elif element_name=='Change_edge' or element_name ==  'Chasse' or element_name==  'Choctaw' or element_name==  'Cross_roll' or element_name== 'Mohawk' or element_name == 'Toe_step':
+            label_id = 1
+        elif element_name == 'No_element':
+            label_id = 2
+        # label_id = element_names.index(element_name)
         mid = train_file.split("_")[0].replace("img", "")
         if not train_file.startswith('.'):
             train_file_dict[train_file] = (mid, label_id)
 
 
+
     for eval_file in eval_files:
-        label_id = element_names.index(element_name)
+        if  element_name =='Bracket' or element_name == 'Counter_turn' or element_name == 'Loop' or element_name == 'Rocker_turn' or element_name== 'Three_turn' or element_name =='Twizzle':
+            label_id = 0
+        elif element_name=='Change_edge' or element_name ==  'Chasse' or element_name==  'Choctaw' or element_name==  'Cross_roll' or element_name== 'Mohawk' or element_name == 'Toe_step':
+            label_id = 1
+        elif element_name == 'No_element':
+            label_id = 2
+        # label_id = element_names.index(element_name)
         mid = eval_file.split("_")[0].replace("img", "")
         if not eval_file.startswith('.'):
             eval_file_dict[eval_file] = (mid, label_id)
-
 
     #########################################
 
@@ -64,7 +81,7 @@ with open("anno_data_eval.pkl", "wb") as anno_data_e:
 # # この時点でエレメントはlabel_id化してしまっていいと思う
 # movie_id = 0
 # frame = ""
-# for filepath, element_label in train_file_dict.items():
+# for filepath, element_name in train_file_dict.items():
 #     # filepath: "img22_576.jpg"とかになってるはず
 #     mid = filepath.split("_")[0].replace("img", "")
 #     frame_id = filepath.split("_")[1].strip()
@@ -72,7 +89,7 @@ with open("anno_data_eval.pkl", "wb") as anno_data_e:
 #         mid = 1
 #     else:
 #          mid = int(mid)
-#     label_id = element_names.index(element_label)
+#     label_id = element_names.index(element_name)
 #     if mid in train_movie_dic.keys():
 #         train_movie_dic[mid].append((filepath, label_id, frame_id))
 #     else:
@@ -92,7 +109,7 @@ with open("anno_data_eval.pkl", "wb") as anno_data_e:
 # # この時点でエレメントはlabel_id化してしまっていいと思う
 # movie_id = 0
 # frame = ""
-# for filepath, element_label in eval_file_dict.items():
+# for filepath, element_name in eval_file_dict.items():
 #     # filepath: "img22_576.jpg"とかになってるはず
 #     mid = filepath.split("_")[0].replace("img", "")
 #     frame_id = filepath.split("_")[1].strip()
@@ -100,7 +117,7 @@ with open("anno_data_eval.pkl", "wb") as anno_data_e:
 #         mid = 1
 #     else:
 #          mid = int(mid)
-#     label_id = element_names.index(element_label)
+#     label_id = element_names.index(element_name)
 #     if mid in eval_movie_dic.keys():
 #         eval_movie_dic[mid].append((filepath, label_id, frame_id))
 #     else:
