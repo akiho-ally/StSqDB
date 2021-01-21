@@ -79,3 +79,21 @@ No_element: 0.8255813953488372 (213.0 / 258.0)
 sameframes 43 no_atten bs 16 epoch 300  
 sameframes 43 no_attn bs8 epoch600   
 sameframes 43 no_attn bs8 epoch600  
+
+
+Average PCE: 0.20721526535480023  
+Bracket: 0.0 (0.0 / 258.0)  
+Change_edge: 0.003875968992248062 (1.0 / 258.0)  
+Chasse: 0.015503875968992248 (4.0 / 258.0)  
+Choctaw: 0.0 (0.0 / 258.0)  
+Counter_turn: 0.0 (0.0 / 258.0)  
+Cross_roll: 0.9961240310077519 (257.0 / 258.0)  
+Loop: 0.15891472868217055 (41.0 / 258.0)  
+Mohawk: 0.0 (0.0 / 258.0)  
+Rocker_turn: 0.7868217054263565 (203.0 / 258.0)  
+Three_turn: 0.21705426356589147 (56.0 / 258.0)  
+Toe_step: 0.0 (0.0 / 258.0)  
+Twizzle: 0.06589147286821706 (17.0 / 258.0)  
+No_element: 0.4496124031007752 (116.0 / 258.0) 
+sameframes 42 no_atten trim bs 8 epoch 2000  
+ 
