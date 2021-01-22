@@ -33,3 +33,14 @@ Rocker_turn: 0.13953488372093023 (36.0 / 258.0)
 Three_turn: 0.0 (0.0 / 258.0)  
 Twizzle: 0.38372093023255816 (99.0 / 258.0)  
 sameframes 43 no_atten turn trim bs 16 epoch400  
+
+Average PCE: 0.5813953488372093  
+Change_edge: 0.8798449612403101 (227.0 / 258.0)  
+Chasse: 0.15503875968992248 (40.0 / 258.0)  
+Choctaw: 0.4573643410852713 (118.0 / 258.0)  
+Cross_roll: 0.8372093023255814 (216.0 / 258.0)  
+Mohawk: 0.47674418604651164 (123.0 / 258.0)  
+Toe_step: 0.6821705426356589 (176.0 / 258.0) 
+sameframes 43 no_atten step trim bs 16 epoch 200  
+sameframes 43 no_atten turn trim bs 16 epoch400   
+sameframes 43 no_atten turn trim bs 16 epoch400  
