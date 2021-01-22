@@ -42,5 +42,4 @@ Cross_roll: 0.8372093023255814 (216.0 / 258.0)
 Mohawk: 0.47674418604651164 (123.0 / 258.0)  
 Toe_step: 0.6821705426356589 (176.0 / 258.0) 
 sameframes 43 no_atten step trim bs 16 epoch 200  
-sameframes 43 no_atten turn trim bs 16 epoch400   
-sameframes 43 no_atten turn trim bs 16 epoch400  
+
