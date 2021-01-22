@@ -49,7 +49,7 @@ def eval(model, split, seq_length, bs, n_cpu, disp):
 
     for i, sample in enumerate(data_loader):
         images, labels = sample['images'].to(device), sample['labels'].to(device)
-        logits = model(images)
+        logits, _ = model(images)
         probs = F.softmax(logits.data, dim=1)  ##確率
         labels = labels.view(int(bs)*int(seq_length))
         _, c, element_c, element_s, conf = correct_preds(probs, labels.squeeze(),use_no_element)
@@ -139,4 +139,4 @@ if __name__ == '__main__':
         plt.xticks(range(13), element_names)
 
         save_dir = '/home/akiho/projects/StSqDB/'
-        plt.savefig(save_dir + 'vgg_figure_13.png')
+        plt.savefig(save_dir + 'attention_figure_13.png')
