@@ -23,3 +23,13 @@ Cross_roll: 0.5 (129.0 / 258.0)
 Mohawk: 0.8565891472868217 (221.0 / 258.0)  
 Toe_step: 0.562015503875969 (145.0 / 258.0)  
 sameframes 43 no_atten step bs 16 epoch 100  
+
+
+Average PCE: 0.31589147286821706  
+Bracket: 0.49612403100775193 (128.0 / 258.0)  
+Counter_turn: 0.3798449612403101 (98.0 / 258.0)  
+Loop: 0.49612403100775193 (128.0 / 258.0)  
+Rocker_turn: 0.13953488372093023 (36.0 / 258.0)  
+Three_turn: 0.0 (0.0 / 258.0)  
+Twizzle: 0.38372093023255816 (99.0 / 258.0)  
+sameframes 43 no_atten turn trim bs 16 epoch400  
