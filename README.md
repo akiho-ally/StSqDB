@@ -43,3 +43,8 @@ Mohawk: 0.47674418604651164 (123.0 / 258.0)
 Toe_step: 0.6821705426356589 (176.0 / 258.0) 
 sameframes 43 no_atten step trim bs 16 epoch 200  
 
+Average PCE: 0.8104005167958657  
+half: 0.66343669250646 (1027.0 / 1548.0)  
+both: 0.9573643410852714 (1482.0 / 1548.0)  
+sameframes 43 no_atten two(half_both) bs 16 epoch 80   
+
