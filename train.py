@@ -16,12 +16,15 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--split', default=1)
     parser.add_argument('--iteration', default=8000)
-    parser.add_argument('--it_save', default=50)
+    parser.add_argument('--it_save', default=100)
     parser.add_argument('--batch_size', default=8)
     parser.add_argument('--seq_length', default=300)
     parser.add_argument('--three', action='store_true')
     parser.add_argument('--turn', action='store_true')
     parser.add_argument('--step', action='store_true')
+    parser.add_argument('--five', action='store_true')
+    parser.add_argument('--two', action='store_true')
+    parser.add_argument('--four', action='store_true')
     args = parser.parse_args()
     # これ以降、このファイル内では "args.iterration" で2000とか呼び出せるようになる
 
@@ -45,6 +48,12 @@ if __name__ == '__main__':
     k = 10  # frozen layers
 
     three = args.three
+    turn = args.turn
+    step = args.step
+    five = args.five
+    two = args.two
+    four = args.four
+
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
@@ -57,7 +66,12 @@ if __name__ == '__main__':
                           device=device,
                           bidirectional=True,
                           dropout=False,
-                          three=three
+                          three=three,
+                          turn = turn,
+                          step =step,
+                          five = five,
+                          two = two,
+                          four = four
                           )
     #print('model.py, class EventDetector()')
 
@@ -70,12 +84,56 @@ if __name__ == '__main__':
 
     # TODO: vid_dirのpathをかえる。stsqの動画を切り出したimage全部が含まれているdirにする
     if three == True:
-        dataset = StsqDB(data_file='data/sameframes/three/seq_length_{}/train_split_1.pkl'.format(args.seq_length),
+        dataset = StsqDB(data_file='data/sampling/trim/three/seq_length_{}/train_split_1.pkl'.format(args.seq_length),
                     vid_dir='data/videos_56/',
                     seq_length=int(seq_length),
                     transform=transforms.Compose([ToTensor(),
                                                 Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
                     train=True)
+    elif turn == True:
+        dataset = StsqDB(data_file='data/sampling/trim/turn/seq_length_{}/train_split_1.pkl'.format(args.seq_length),
+                    vid_dir='data/videos_56/',
+                    seq_length=int(seq_length),
+                    transform=transforms.Compose([ToTensor(),
+                                                Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+                    train=True)
+    elif step == True:
+        dataset = StsqDB(data_file='data/sampling/trim/step/seq_length_{}/train_split_1.pkl'.format(args.seq_length),
+                    vid_dir='data/videos_56/',
+                    seq_length=int(seq_length),
+                    transform=transforms.Compose([ToTensor(),
+                                                Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+                    train=True)
+    elif five == True:
+        dataset = StsqDB(data_file='data/sampling/five/seq_length_{}/train_split_1.pkl'.format(args.seq_length),
+                    vid_dir='data/videos_56/',
+                    seq_length=int(seq_length),
+                    transform=transforms.Compose([ToTensor(),
+                                                Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+                    train=True)
+
+    elif two == True:
+        dataset = StsqDB(data_file='data/sampling/two/turn_step/seq_length_{}/train_split_1.pkl'.format(args.seq_length),
+                    vid_dir='data/videos_56/',
+                    seq_length=int(seq_length),
+                    transform=transforms.Compose([ToTensor(),
+                                                Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+                    train=True)
+    elif four == True:
+        dataset = StsqDB(data_file='data/sampling/four_one_half_rotate/seq_length_{}/train_split_1.pkl'.format(args.seq_length),
+                    vid_dir='data/videos_56/',
+                    seq_length=int(seq_length),
+                    transform=transforms.Compose([ToTensor(),
+                                                Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+                    train=True)
+    else:
+        dataset = StsqDB(data_file='data/sampling/seq_length_{}/train_split_1.pkl'.format(args.seq_length),
+                    vid_dir='data/videos_56/',
+                    seq_length=int(seq_length),
+                    transform=transforms.Compose([ToTensor(),
+                                                Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])]),
+                    train=True)
+
     print('dataloader.py, class StsqDB()')
     # dataset.__len__() : 1050
 
@@ -93,10 +151,19 @@ if __name__ == '__main__':
     # the ratio of events to no-events is approximately 1:35 so weight classes accordingly:
     # TODO: edit weights shape from golf-8-element to stsq-12-element
     if three == True:
-        weights = torch.FloatTensor([1/3, 1, 2/5, 1/3, 1/6, 1, 1/4, 1, 1/4, 1/3, 1/2, 1/6]).to(device)
-    else:
-        # weights = torch.FloatTensor([1/3, 1, 2/5, 1/3, 1/6, 1, 1/4, 1, 1/4, 1/3, 1/2, 1/6, 1/60]).to(device)
         weights = torch.FloatTensor([1, 1, 1]).to(device)
+    elif turn == True:
+        weights = torch.FloatTensor([1, 1, 1,1,1,1]).to(device)
+    elif step == True:
+        weights = torch.FloatTensor([1, 1, 1,1,1,1]).to(device)
+    elif five == True:
+        weights = torch.FloatTensor([1, 1, 1,1,1]).to(device)
+    elif two == True:
+        weights = torch.FloatTensor([1, 1]).to(device)
+    elif four == True:
+        weights = torch.FloatTensor([1, 1, 1, 1]).to(device)
+    else:
+        weights = torch.FloatTensor([1, 1, 1, 1,1,1,1,1,1,1,1,1]).to(device)
 
     criterion = torch.nn.CrossEntropyLoss(weight=weights)
     optimizer = torch.optim.Adam(filter(lambda p: p.requires_grad, model.parameters()), lr=0.001)  ##lambda:無名関数
@@ -104,8 +171,8 @@ if __name__ == '__main__':
     losses = AverageMeter()
     #print('utils.py, class AverageMeter()')
 
-    if not os.path.exists('models/sameframes/'):
-        os.mkdir('models/sameframes/')
+    if not os.path.exists('models/sampling/'):
+        os.mkdir('models/sampling/')
 
 
 
@@ -115,7 +182,7 @@ if __name__ == '__main__':
 
         for sample in tqdm(data_loader):
             images, labels = sample['images'].to(device), sample['labels'].to(device)
-            logits, mask = model(images.float())
+            logits= model(images.float())
             labels = labels.view(int(bs)*int(seq_length))
             loss = criterion(logits, labels)
             optimizer.zero_grad()
@@ -130,8 +197,37 @@ if __name__ == '__main__':
             epoch += 1
             if epoch % int(it_save) == 0:
                 torch.save({'optimizer_state_dict': optimizer.state_dict(),
-                            'model_state_dict': model.state_dict()}, 'models/sameframes/three/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
-
+                            'model_state_dict': model.state_dict()}, 'models/sampling/trim/three/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+        elif turn == True:
+            epoch += 1
+            if epoch % int(it_save) == 0:
+                torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                            'model_state_dict': model.state_dict()}, 'models/sampling/trim/turn/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+        elif step == True:
+            epoch += 1
+            if epoch % int(it_save) == 0:
+                torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                            'model_state_dict': model.state_dict()}, 'models/sampling/trim/step/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+        elif five == True:
+            epoch += 1
+            if epoch % int(it_save) == 0:
+                torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                            'model_state_dict': model.state_dict()}, 'models/sampling/five/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+        elif two == True:
+            epoch += 1
+            if epoch % int(it_save) == 0:
+                torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                            'model_state_dict': model.state_dict()}, 'models/sampling/turn_step/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+        elif four == True:
+            epoch += 1
+            if epoch % int(it_save) == 0:
+                torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                            'model_state_dict': model.state_dict()}, 'models/sampling/four_one_half_rotate/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
+        else:
+            epoch += 1
+            if epoch % int(it_save) == 0:
+                torch.save({'optimizer_state_dict': optimizer.state_dict(),
+                            'model_state_dict': model.state_dict()}, 'models/sampling/seq_length_{}/swingnet_{}.pth.tar'.format(args.seq_length, epoch))
 
             if epoch == iterations:
                 break

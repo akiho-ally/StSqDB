@@ -6,7 +6,7 @@ import torchvision.models as models
 
 
 class EventDetector(nn.Module):
-    def __init__(self, pretrain, width_mult, lstm_layers, lstm_hidden, device, three, bidirectional=True, dropout=True):
+    def __init__(self, pretrain, width_mult, lstm_layers, lstm_hidden, device, three, turn, step, five,two, four,bidirectional=True, dropout=True):
         super(EventDetector, self).__init__()
         self.width_mult = width_mult
         self.lstm_layers = lstm_layers
@@ -15,6 +15,12 @@ class EventDetector(nn.Module):
         self.dropout = dropout
         self.device = device
         self.three = three
+        self.turn = turn
+        self.step = step
+        self.five = five
+        self.two = two
+        self.four = four
+
 
 
         # #モデルの読み込み
@@ -37,6 +43,38 @@ class EventDetector(nn.Module):
                 self.lin = nn.Linear(2*self.lstm_hidden, 3)
             else:
                 self.lin = nn.Linear(self.lstm_hidden, 3)
+        elif self.turn == True:
+            if self.bidirectional:
+                self.lin = nn.Linear(2*self.lstm_hidden, 6)
+            else:
+                self.lin = nn.Linear(self.lstm_hidden, 6)
+        elif self.step == True:
+            if self.bidirectional:
+                self.lin = nn.Linear(2*self.lstm_hidden, 6)
+            else:
+                self.lin = nn.Linear(self.lstm_hidden, 6)
+        elif self.five == True:
+            if self.bidirectional:
+                self.lin = nn.Linear(2*self.lstm_hidden, 5)
+            else:
+                self.lin = nn.Linear(self.lstm_hidden, 5)
+        elif self.two == True:
+            if self.bidirectional:
+                self.lin = nn.Linear(2*self.lstm_hidden, 2)
+            else:
+                self.lin = nn.Linear(self.lstm_hidden, 2)
+        elif self.four == True:
+            if self.bidirectional:
+                self.lin = nn.Linear(2*self.lstm_hidden, 4)
+            else:
+                self.lin = nn.Linear(self.lstm_hidden, 4)
+        else:
+            if self.bidirectional:
+                self.lin = nn.Linear(2*self.lstm_hidden, 12)
+            else:
+                self.lin = nn.Linear(self.lstm_hidden, 12)
+
+
 
 
         if self.dropout:
@@ -73,7 +111,20 @@ class EventDetector(nn.Module):
         # out.shape => torch.Size([1, 300, 13])
         if self.three == True:
             out = out.view(batch_size*timesteps, 3)
+        elif self.turn == True:
+            out = out.view(batch_size*timesteps, 6)
+        elif self.step == True:
+            out = out.view(batch_size*timesteps, 6)
+        elif self.five == True:
+            out = out.view(batch_size*timesteps, 5)
+        elif self.two == True:
+            out = out.view(batch_size*timesteps, 2)
+        elif self.four == True:
+            out = out.view(batch_size*timesteps, 4)
+        else:
+            out = out.view(batch_size*timesteps, 12)
+
         # out.shape => torch.Size([300, 13])
-        return out,
+        return out
 
 
